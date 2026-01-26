@@ -1,39 +1,50 @@
 import json
-import random
 import os
+from pathlib import Path
 
 class DomainManager:
-    def __init__(self, domain_name="hr"):
-        # 自动定位到 backend/domain_db 目录
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        file_path = os.path.join(base_dir, "domain_db", f"{domain_name}.json")
+    def __init__(self, domain: str = "hr"):
+        self.domain = domain
+        # 1. 自动定位到 backend/domain_db/hr.json
+        # 这里的路径是相对于当前文件的：父级(simulation_engine) -> 父级(backend) -> domain_db
+        self.db_path = Path(__file__).resolve().parent.parent / "domain_db" / f"{domain}.json"
         
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"Domain file not found: {file_path}")
+        # 2. 关键修复：初始化 self.domain_db 属性
+        self.domain_db = {"taxonomy": []} 
+        
+        # 3. 立即加载数据
+        self.load_domain_data()
 
-        with open(file_path, 'r', encoding='utf-8') as f:
-            self.data = json.load(f)
-            
-        self.domain_name = self.data['domain']
-        self.categories = self.data['categories']
+    def load_domain_data(self):
+        """从 JSON 文件加载知识库"""
+        if not self.db_path.exists():
+            print(f"⚠️ 警告: 找不到知识库文件 {self.db_path}")
+            # 如果文件不存在，初始化一个空的结构，防止报错
+            self.domain_db = {"taxonomy": []}
+            return
+
+        try:
+            with open(self.db_path, "r", encoding="utf-8") as f:
+                self.domain_db = json.load(f)
+            print(f"📚 DomainManager: 已加载 {self.domain} 知识库")
+        except Exception as e:
+            print(f"❌ 错误: 知识库文件损坏 - {e}")
+            self.domain_db = {"taxonomy": []}
 
     def get_expert_context(self):
-        """生成给专家看的'地图'（只有大类和名词，没有具体症状）"""
-        context = []
-        for cat in self.categories:
-            services = [svc['expert_term'] for svc in cat['services']]
-            context.append(f"- 【{cat['name']}】: {', '.join(services)}")
-        return "\n".join(context)
-
-    def generate_secret_mission(self):
-        """随机抽取一个小白的秘密任务"""
-        all_services = []
-        for cat in self.categories:
-            for svc in cat['services']:
-                svc['category_name'] = cat['name']
-                all_services.append(svc)
+        """将 JSON 数据转化为 AI 可读的 Prompt 文本"""
+        context_lines = []
+        taxonomy = self.domain_db.get("taxonomy", [])
         
-        if not all_services:
-            raise ValueError("没有找到任何服务项，请检查 json 文件内容")
+        for category in taxonomy:
+            cat_name = category.get("name", "未命名大类")
+            services = category.get("services", [])
+            services_str = ", ".join(services)
+            context_lines.append(f"【{cat_name}】: {services_str}")
             
-        return random.choice(all_services)
+        return "\n".join(context_lines)
+
+# 测试代码
+if __name__ == "__main__":
+    dm = DomainManager("hr")
+    print(dm.get_expert_context())

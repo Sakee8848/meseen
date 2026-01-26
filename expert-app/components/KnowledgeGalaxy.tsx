@@ -1,284 +1,152 @@
-"use client";
-
-import React, { useEffect, useState, useCallback } from 'react';
-import ReactFlow, { 
-  Background, 
-  Controls, 
-  useNodesState, 
-  useEdgesState, 
-  Position,
-  Node
+import React, { useEffect, useCallback } from 'react';
+import ReactFlow, {
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Connection,
+  Edge,
+  MarkerType,
+  Background,
+  Controls,
+  MiniMap
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import dagre from 'dagre';
-import { Database, Network, GitGraph, X, MessageSquare } from 'lucide-react';
 
-const API_BASE = "http://127.0.0.1:8000/api";
+// 初始根节点
+const initialNodes = [
+  {
+    id: 'root',
+    type: 'input',
+    data: { label: '🏢 Human Resources' },
+    position: { x: 400, y: 50 },
+    style: { 
+      background: '#111827', 
+      color: 'white', 
+      border: '1px solid #374151', 
+      width: 180, 
+      fontWeight: 'bold',
+      fontSize: '16px',
+      borderRadius: '8px',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+    },
+  },
+];
 
-// --- 布局配置 ---
-const nodeWidth = 220;
-const nodeHeight = 80;
-
-const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
-  const dagreGraph = new dagre.graphlib.Graph();
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
-  dagreGraph.setGraph({ rankdir: direction });
-
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-  });
-
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
-  });
-
-  dagre.layout(dagreGraph);
-
-  const layoutedNodes = nodes.map((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id);
-    node.targetPosition = direction === 'LR' ? Position.Left : Position.Top;
-    node.sourcePosition = direction === 'LR' ? Position.Right : Position.Bottom;
-    node.position = {
-      x: nodeWithPosition.x - nodeWidth / 2,
-      y: nodeWithPosition.y - nodeHeight / 2,
-    };
-    return node;
-  });
-
-  return { nodes: layoutedNodes, edges };
-};
-
-export default function KnowledgeGalaxy() {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+export const KnowledgeGalaxy = () => {
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [stats, setStats] = useState({ cases: 0, services: 0 });
-  
-  // 🔬 显微镜状态：当前选中的案例详情
-  const [selectedCase, setSelectedCase] = useState<any>(null);
 
-  const fetchGraph = useCallback(async () => {
+  // 核心：从后端拉取最新的图谱数据
+  const fetchGraphData = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/knowledge`);
-      const json = await res.json();
-      const records = json.records || [];
-
-      // --- 1. 数据聚合 ---
-      const serviceMap = new Map(); 
+      const res = await fetch("http://127.0.0.1:8000/api/taxonomy");
+      const data = await res.json();
       
-      records.forEach((r: any) => {
-        const service = r.expert_diagnosis || "未分类服务";
-        const intent = r.secret_intent || "未知用户需求";
-        
-        if (!serviceMap.has(service)) {
-          serviceMap.set(service, []);
-        }
-        
-        // 把完整记录(包含对话历史)存进去，而不仅仅是字符串
-        // 只有当意图不重复时才添加 (简单去重)
-        const existing = serviceMap.get(service).find((item: any) => item.intent === intent);
-        if (!existing) {
-            serviceMap.get(service).push({
-                intent: intent,
-                fullRecord: r // <--- 关键：把整个案宗藏在这里
-            });
-        }
-      });
+      // 适配 V1.1 新结构 (taxonomy)
+      if (!data.taxonomy) return;
 
-      setStats({ cases: records.length, services: serviceMap.size });
+      const newNodes = [...initialNodes];
+      const newEdges = [];
+      
+      let categoryX = 50;
+      const categoryY = 200;
+      const serviceY = 400;
 
-      // --- 2. 构建节点 ---
-      const initialNodes = [];
-      const initialEdges = [];
-
-      // Root
-      initialNodes.push({
-        id: 'root',
-        data: { label: '🏢 Human Resources' },
-        style: { 
-            background: '#0f172a', color: '#fff', fontSize: 16, fontWeight: 'bold', 
-            width: 180, borderRadius: '8px', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center',
-            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-        }
-      });
-
-      let serviceIndex = 0;
-      serviceMap.forEach((items, serviceName) => {
-        const serviceId = `svc-${serviceIndex}`;
-        
-        // Service Node
-        initialNodes.push({
-          id: serviceId,
-          data: { label: serviceName },
+      data.taxonomy.forEach((category: any, catIndex: number) => {
+        // 1. 创建大类节点
+        const catId = `cat-${catIndex}`;
+        newNodes.push({
+          id: catId,
+          data: { label: category.name.split(' ')[0] }, // 只显示中文名，简短点
+          position: { x: categoryX, y: categoryY },
           style: { 
-            background: '#2563eb', color: '#fff', fontSize: 14, fontWeight: '500',
-            width: 200, borderRadius: '6px', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center',
-            boxShadow: '0 4px 6px -1px rgb(37 99 235 / 0.3)'
-          }
+            background: '#2563EB', 
+            color: 'white', 
+            border: 'none',
+            borderRadius: '6px',
+            width: 150,
+            fontSize: '12px'
+          },
         });
 
-        initialEdges.push({
-          id: `e-root-${serviceId}`,
+        // 连接 根 -> 大类
+        newEdges.push({
+          id: `e-root-${catId}`,
           source: 'root',
-          target: serviceId,
+          target: catId,
           type: 'smoothstep',
-          style: { stroke: '#94a3b8', strokeWidth: 1.5 }
+          animated: true,
+          style: { stroke: '#4B5563' },
         });
 
-        // Intent Nodes (Leafs)
-        items.forEach((item: any, i: number) => {
-          const intentId = `intent-${serviceIndex}-${i}`;
-          const safeIntent = String(item.intent);
-          const labelText = safeIntent.length > 18 ? safeIntent.substring(0, 18) + "..." : safeIntent;
-
-          initialNodes.push({
-            id: intentId,
-            // 🔬 关键：把历史记录塞进 data 里的 hiddenDetail 字段
-            data: { 
-                label: `🗣️ ${labelText}`,
-                hiddenDetail: item.fullRecord 
-            },
+        // 2. 创建服务节点 (修正：现在 services 是字符串数组)
+        category.services.forEach((serviceName: string, servIndex: number) => {
+          const servId = `serv-${catIndex}-${servIndex}`;
+          newNodes.push({
+            id: servId,
+            data: { label: serviceName },
+            position: { x: categoryX, y: serviceY + (servIndex * 60) }, // 垂直排列
             style: { 
-                fontSize: 12, background: '#fff', color: '#475569', 
-                width: 190, border: '1px solid #e2e8f0', borderRadius: '4px',
-                padding: '8px', cursor: 'pointer', // 手型光标，提示可点击
-                transition: 'all 0.2s'
-            }
+              background: '#FFFFFF', 
+              color: '#374151', 
+              border: '1px solid #E5E7EB',
+              fontSize: '10px',
+              width: 140,
+            },
           });
 
-          initialEdges.push({
-            id: `e-${serviceId}-${intentId}`,
-            source: serviceId,
-            target: intentId,
+          // 连接 大类 -> 服务
+          newEdges.push({
+            id: `e-${catId}-${servId}`,
+            source: catId,
+            target: servId,
             type: 'default',
-            style: { stroke: '#cbd5e1' }
+            markerEnd: { type: MarkerType.ArrowClosed, color: '#9CA3AF' },
+            style: { stroke: '#9CA3AF' },
           });
         });
 
-        serviceIndex++;
+        // 计算下一个大类的 X 坐标 (拉开间距)
+        categoryX += 200;
       });
-      
-      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(initialNodes, initialEdges, 'TB');
-      setNodes(layoutedNodes);
-      setEdges(layoutedEdges);
+
+      setNodes(newNodes);
+      setEdges(newEdges);
 
     } catch (err) {
-      console.error("图谱生成失败:", err);
+      console.error("Failed to fetch graph", err);
     }
   }, [setNodes, setEdges]);
 
+  // 组件加载时，拉取一次数据
   useEffect(() => {
-    fetchGraph();
-  }, [fetchGraph]);
+    fetchGraphData();
+    
+    // 设置一个定时器，每 5 秒自动刷新一次，这样你注入新知识后，不用刷新页面就能看到变化！
+    const interval = setInterval(fetchGraphData, 5000);
+    return () => clearInterval(interval);
+  }, [fetchGraphData]);
 
-  // 🔬 点击事件处理
-  const onNodeClick = (_: React.MouseEvent, node: Node) => {
-    if (node.data.hiddenDetail) {
-        setSelectedCase(node.data.hiddenDetail);
-    } else {
-        setSelectedCase(null);
-    }
-  };
+  const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   return (
-    <div className="h-full w-full flex flex-col relative overflow-hidden">
-       {/* 顶部栏 */}
-       <div className="bg-white border-b flex justify-between items-center px-6 py-3 shadow-sm z-10">
-          <div className="flex items-center gap-2 text-gray-800 font-bold">
-             <div className="bg-indigo-100 p-1.5 rounded-md text-indigo-600">
-                <GitGraph size={20}/> 
-             </div>
-             <span>Meseeing 行业知识图谱</span>
-          </div>
-          <div className="text-xs text-gray-500 flex gap-6">
-             <span className="flex items-center gap-1.5"><Database size={14} className="text-gray-400"/> 累计案例: <span className="font-mono font-bold text-gray-800">{stats.cases}</span></span>
-             <span className="flex items-center gap-1.5"><Network size={14} className="text-blue-500"/> 已挖掘服务: <span className="font-mono font-bold text-blue-600">{stats.services}</span></span>
-          </div>
-       </div>
-
-       {/* 画布区域 */}
-       <div className="flex-1 bg-slate-50 relative">
-          <ReactFlow 
-            nodes={nodes} 
-            edges={edges} 
-            onNodesChange={onNodesChange} 
-            onEdgesChange={onEdgesChange}
-            onNodeClick={onNodeClick} // <--- 绑定点击事件
-            fitView
-            attributionPosition="bottom-right"
-          >
-             <Background color="#94a3b8" gap={25} size={1} />
-             <Controls showInteractive={false} />
-          </ReactFlow>
-
-          {/* 🔬 侧边显微镜面板 (Slide-over) */}
-          <div className={`absolute top-0 right-0 h-full w-96 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out border-l border-gray-200 z-20 flex flex-col ${selectedCase ? 'translate-x-0' : 'translate-x-full'}`}>
-            
-            {selectedCase && (
-                <>
-                    {/* Header */}
-                    <div className="p-4 border-b bg-gray-50 flex justify-between items-start">
-                        <div>
-                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-1">🔍 显微镜视图</h3>
-                            <p className="text-xs text-gray-500">ID: {selectedCase.id}</p>
-                        </div>
-                        <button onClick={() => setSelectedCase(null)} className="text-gray-400 hover:text-gray-600 transition">
-                            <X size={20} />
-                        </button>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                        {/* 1. 原始意图 */}
-                        <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-100">
-                            <h4 className="text-xs font-bold text-yellow-700 mb-1 flex items-center gap-1">
-                                🕵️ 用户真实意图 (Secret)
-                            </h4>
-                            <p className="text-sm text-gray-800 italic">"{selectedCase.secret_intent}"</p>
-                        </div>
-
-                        {/* 2. 对话回放 */}
-                        <div>
-                            <h4 className="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center gap-1">
-                                <MessageSquare size={12}/> 挖掘过程回放
-                            </h4>
-                            <div className="space-y-4">
-                                {selectedCase.dialogue_path.map((step: any, idx: number) => (
-                                    <div key={idx} className="relative pl-4 border-l-2 border-gray-200 pb-4 last:border-0 last:pb-0">
-                                        <div className="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-gray-300"></div>
-                                        
-                                        {/* 专家问 */}
-                                        <div className="mb-2">
-                                            <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">AI Expert</span>
-                                            <p className="text-xs text-gray-700 mt-1 leading-relaxed bg-gray-50 p-2 rounded-md rounded-tl-none">
-                                                {step.expert_question}
-                                            </p>
-                                        </div>
-
-                                        {/* 小白答 */}
-                                        <div className="text-right">
-                                             <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">User</span>
-                                             <p className="text-xs text-gray-800 mt-1 leading-relaxed bg-blue-50 p-2 rounded-md rounded-tr-none inline-block text-left">
-                                                {step.novice_response}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* 3. 最终诊断 */}
-                        <div className="bg-indigo-600 text-white p-4 rounded-lg shadow-md mt-4">
-                             <h4 className="text-xs font-bold text-indigo-200 uppercase mb-1">✅ 最终确诊服务</h4>
-                             <p className="font-bold text-lg">{selectedCase.expert_diagnosis}</p>
-                             <p className="text-xs text-indigo-200 mt-2 pt-2 border-t border-indigo-500/30">
-                                {selectedCase.final_conclusion}
-                             </p>
-                        </div>
-                    </div>
-                </>
-            )}
-          </div>
-       </div>
+    <div style={{ width: '100%', height: '100%' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        fitView
+        attributionPosition="bottom-right"
+      >
+        <Background color="#333" gap={16} />
+        <Controls />
+        <MiniMap style={{ height: 120 }} zoomable pannable />
+      </ReactFlow>
     </div>
   );
-}
+};
+
+// 必须使用 default 导出，以匹配 page.tsx 的引用方式
+export default KnowledgeGalaxy;

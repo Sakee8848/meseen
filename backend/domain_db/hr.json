@@ -1,72 +1,40 @@
 {
-  "domain": "Human Resources",
-  "categories": [
+  "taxonomy": [
     {
       "name": "招聘与人才获取 (Talent Acquisition)",
+      "description": "关于人才获取、面试流程及入职管理的专业服务",
       "services": [
-        {
-          "expert_term": "高端猎头服务 (Executive Search)",
-          "novice_intent": "我想招一个CTO或者副总，但是市面上找不到，需要挖墙脚，普通招聘网站没用。"
-        },
-        {
-          "expert_term": "灵活用工/兼职招聘 (Flexible Staffing)",
-          "novice_intent": "我们需要临时招一批人干两个月，不想签正式劳动合同，太麻烦了，有没有省事的办法？"
-        },
-        {
-          "expert_term": "背景调查 (Background Check)",
-          "novice_intent": "刚面的这个人简历太完美了，我怀疑他学历造假或者隐瞒了什么，想查查底细。"
-        },
-        {
-          "expert_term": "RPO招聘流程外包",
-          "novice_intent": "我们要去外地开分公司，一下子要招几十个销售，HR忙不过来，想包出去。"
-        }
+        "高端猎头服务 (Executive Search)",
+        "灵活用工/兼职招聘 (Flexible Staffing)",
+        "背景调查 (Background Check)",
+        "RPO招聘流程外包",
+        "设施设备紧急维修"
       ]
     },
     {
       "name": "劳动关系与合规 (Employee Relations & Compliance)",
+      "description": "处理劳动合同、离职纠纷及法律风险防控",
       "services": [
-        {
-          "expert_term": "裁员/辞退合规咨询 (Termination Compliance)",
-          "novice_intent": "公司业绩不好想裁掉几个人，但怕他们闹事或者告我们，想知道怎么做才合法安全。"
-        },
-        {
-          "expert_term": "员工手册与规章制度设计",
-          "novice_intent": "公司人多了，现在乱糟糟的，想立个规矩，比如考勤怎么算、请假怎么扣钱。"
-        },
-        {
-          "expert_term": "劳动仲裁应诉代理",
-          "novice_intent": "前两天收到了法院传票，前员工告我们要赔偿金，我该怎么办？"
-        }
+        "裁员/辞退合规咨询 (Termination Compliance)",
+        "员工手册与规章制度设计",
+        "劳动仲裁应诉代理"
       ]
     },
     {
       "name": "薪酬福利与税务 (Comp & Ben)",
+      "description": "设计具有竞争力的薪酬体系与员工福利方案",
       "services": [
-        {
-          "expert_term": "薪酬结构设计 (Salary Structure Design)",
-          "novice_intent": "我感觉现在的工资发得有问题，老员工没动力，新员工嫌钱少，想改改发钱的规则。"
-        },
-        {
-          "expert_term": "个税优化/薪税筹划",
-          "novice_intent": "高管每个月扣税扣太多了，有没有什么合法的办法让他们多拿点到手？"
-        },
-        {
-          "expert_term": "社保公积金代缴 (Social Security Proxy)",
-          "novice_intent": "我们在外地招了个销售，但是当地没有注册公司，没法给他交社保，怎么办？"
-        }
+        "薪酬结构设计 (Salary Structure Design)",
+        "个税优化/薪税筹划",
+        "社保公积金代缴 (Social Security Proxy)"
       ]
     },
     {
       "name": "组织发展与培训 (OD & TD)",
+      "description": "提升员工技能，构建人才梯队",
       "services": [
-        {
-          "expert_term": "股权激励方案设计 (ESOP)",
-          "novice_intent": "想给核心团队分点干股或者期权，把大家绑在一起，但不知道怎么分才公平。"
-        },
-        {
-          "expert_term": "企业内训/领导力培训",
-          "novice_intent": "提拔上来的几个经理虽然业务好，但不会带团队，搞得下面人怨声载道，想给他们上上课。"
-        }
+        "股权激励方案设计 (ESOP)",
+        "企业内训/领导力培训"
       ]
     }
   ]

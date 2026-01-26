@@ -1,221 +1,224 @@
-import json
 import os
-import time
-from datetime import datetime
+import json
+from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from langchain_core.messages import AIMessage, HumanMessage
+from dotenv import load_dotenv
 
-# 引入核心模块
+# 引入内部模块
 from simulation_engine.domain_manager import DomainManager
-from simulation_engine.graph import app as graph_app
+from simulation_engine.graph import app as graph_app 
+
+# 加载环境变量
+load_dotenv()
+
+# ==========================================
+# 1. 核心对象初始化 (强制启动模式)
+# ==========================================
+print("-" * 50)
+print("🚀 系统正在启动...")
+
+# 尝试初始化大脑
+domain_mgr = None
+try:
+    # 强制在启动时直接加载，不再等待
+    domain_mgr = DomainManager("hr")
+    
+    # 打印一下看看到底加载了啥
+    taxonomy_count = len(domain_mgr.domain_db.get("taxonomy", []))
+    print(f"✅ 大脑加载成功！")
+    print(f"📊 当前包含服务大类: {taxonomy_count} 个")
+    
+except Exception as e:
+    print(f"❌ 大脑加载失败: {e}")
+    print("⚠️ 系统将以空脑模式运行，请检查 backend/domain_db/hr.json 是否存在")
+
+print("-" * 50)
 
 app = FastAPI()
 
+# ==========================================
+# 2. CORS 安全配置 (确保 3000 和 3001 都能用)
+# ==========================================
+origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-sessions = {}
+# ==========================================
+# 3. 接口定义
+# ==========================================
 
-# =========================================================================
-#  KnowledgeRecorder
-# =========================================================================
-class KnowledgeRecorder:
-    def __init__(self, filename="knowledge_base.json"):
-        self.filename = filename
-        if not os.path.exists(self.filename):
-            with open(self.filename, 'w', encoding='utf-8') as f:
-                json.dump([], f)
-
-    def save_run(self, domain, secret_mission, history):
-        path = []
-        for i in range(0, len(history) - 1, 2):
-            if i+1 < len(history):
-                expert_msg = history[i].content
-                novice_msg = history[i+1].content
-                path.append({
-                    "step": (i // 2) + 1,
-                    "expert_question": expert_msg,
-                    "novice_response": novice_msg
-                })
-
-        final_conclusion = history[-1].content if history else ""
-        expert_diagnosis = secret_mission.get("expert_term", "未分类服务")
-        secret_intent = secret_mission.get("novice_intent", "未知用户需求")
-
-        record = {
-            "id": f"sim_{int(time.time())}",
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "domain": domain,
-            "secret_intent": secret_intent,
-            "expert_diagnosis": expert_diagnosis,
-            "dialogue_path": path,
-            "final_conclusion": final_conclusion
-        }
-
-        with open(self.filename, 'r+', encoding='utf-8') as f:
-            try:
-                data = json.load(f)
-            except json.JSONDecodeError:
-                data = []
-            
-            data.append(record)
-            f.seek(0)
-            json.dump(data, f, ensure_ascii=False, indent=2)
-            
-        print(f"✅ [Recorder] 成功保存案例: {expert_diagnosis}")
-
-    def get_all(self):
-        if not os.path.exists(self.filename):
-            return []
-        with open(self.filename, 'r', encoding='utf-8') as f:
-            try:
-                return json.load(f)
-            except:
-                return []
-
-recorder = KnowledgeRecorder()
-
-# =========================================================================
-#  API 接口
-# =========================================================================
-
-class StartReq(BaseModel):
+# --- A. 聊天接口 ---
+class ChatRequest(BaseModel):
+    message: str
     domain: str = "hr"
 
-@app.post("/api/start")
-def start_simulation(req: StartReq):
+@app.post("/api/chat")
+async def chat_endpoint(request: ChatRequest):
+    if not domain_mgr:
+        # 如果大脑没加载，尝试临场救急
+        return {"response": "系统初始化异常，请检查后端日志。"}
+    
+    inputs = {
+        "messages": [("user", request.message)],
+        "domain": request.domain,
+        "taxonomy_context": domain_mgr.get_expert_context(),
+        "secret_mission": {"category": "unknown", "expert_term": "unknown", "novice_intent": "unknown"},
+        "is_concluded": False,
+        "turn_count": 0
+    }
+    config = {"configurable": {"thread_id": "1"}}
+    
+    result = graph_app.invoke(inputs, config=config)
+    last_message = result["messages"][-1]
+    return {"response": last_message.content}
+
+# --- B. 知识库日志接口 ---
+@app.get("/api/knowledge/logs")
+async def get_knowledge_logs():
+    # 这是一个独立的接口，读取 JSON 文件
+    log_path = Path(__file__).resolve().parent.parent / "etl_factory" / "processing_log.json"
+    
+    if not log_path.exists():
+        return []
     try:
-        dm = DomainManager(req.domain)
-        secret = dm.generate_secret_mission()
-        expert_ctx = dm.get_expert_context()
-        
-        session_id = "sim_demo"
-        
-        sessions[session_id] = {
-            "messages": [HumanMessage(content="你好，我想咨询一些业务问题。")],
-            "domain": req.domain,
-            "taxonomy_context": expert_ctx,
-            "secret_mission": secret,
-            "is_concluded": False,
-            "turn_count": 0
-        }
-        
-        print(f"🚀 [Start] 新任务目标: {secret['expert_term']}")
-        
-        return {
-            "msg": "Simulation Started", 
-            "secret_preview": secret['novice_intent'], 
-            "expert_map": expert_ctx
-        }
+        with open(log_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data[::-1] 
     except Exception as e:
-        print(f"❌ Start Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        return [{"error": str(e)}]
 
-@app.post("/api/next")
-def next_turn():
-    session_id = "sim_demo"
-    state = sessions.get(session_id)
-    
-    if not state:
-        return {"error": "Please start simulation first"}
-    
-    current_secret = state.get("secret_mission", {})
-    
-    # --- 情况 A: 已经是结束状态 (用户看完了诊断消息，再次点击“下一步”) ---
-    # 这时候我们才真正告诉前端：结束了！
-    if state["is_concluded"]:
-        diagnosis = current_secret.get("expert_term", "Unknown")
-        return {
-            "status": "Finished", 
-            "concluded": True,
-            "history": _format_history(state["messages"]),
-            "final_diagnosis": diagnosis,
-            "expert_diagnosis": diagnosis,
-            "diagnosis": diagnosis, 
-            "final_conclusion": state["messages"][-1].content
-        }
+# --- C. 大脑编辑接口 (修复下拉菜单和星图) ---
+class TaxonomyUpdate(BaseModel):
+    category: str
+    service: str
 
-    # --- 情况 B: 还在运行中，计算下一轮 ---
+@app.get("/api/taxonomy")
+async def get_taxonomy():
+    """这是星图和下拉菜单的数据源"""
+    if not domain_mgr:
+        # 返回空结构防止前端报错
+        return {"taxonomy": []}
+    return domain_mgr.domain_db
+
+@app.post("/api/taxonomy/add")
+async def add_service(update: TaxonomyUpdate):
+    """注入新知识"""
+    if not domain_mgr:
+        raise HTTPException(status_code=500, detail="Domain Manager missing")
+    
     try:
-        result = graph_app.invoke(state)
+        current_db = domain_mgr.domain_db
         
-        # 补丁：防止 secret 丢失
-        if "secret_mission" not in result:
-             result["secret_mission"] = current_secret
-             
-        sessions[session_id] = result # 更新内存状态
-
-        # --- 核心逻辑：刚刚触发了结束 ---
-        if result["is_concluded"]:
-            diagnosis = current_secret.get("expert_term", "未分类服务")
-            
-            # 1. 保存数据 (确保星图更新)
-            recorder.save_run(
-                domain=result["domain"],
-                secret_mission=current_secret, 
-                history=result["messages"][1:] 
-            )
-            print(f"🏁 [Finish] 确诊结果: {diagnosis}")
-
-            # 2. 【关键欺骗】构造系统消息
-            system_msg = AIMessage(content=f"✅ 【系统诊断完成】\n\n经过多轮分析，专家为您匹配的最佳服务是：\n\n👉 **{diagnosis}**\n\n(该案例已自动归档至知识星图)")
-            
-            # 3. 将这条消息追加到内存历史中 (为了下一次点击能读到)
-            result["messages"].append(system_msg)
-            sessions[session_id] = result 
-
-            # 4. 【欺骗前端】告诉它“还没结束” (concluded=False)
-            # 这样它就会乖乖渲染上面那条 system_msg 气泡！
-            
-            new_latest = result["messages"][-2:]
-            formatted_latest = []
-            for m in new_latest:
-                role = "expert" if isinstance(m, AIMessage) else "novice"
-                formatted_latest.append({"role": role, "content": m.content})
-
-            return {
-                "status": "Running", # <--- 假装还在跑
-                "concluded": False,  # <--- 假装没结束 !!!
-                "turn": result["turn_count"] + 1, # 强制刷新
-                "latest_exchange": formatted_latest
+        # 1. 查找大类
+        target_category = None
+        for cat in current_db["taxonomy"]:
+            if cat["name"] == update.category:
+                target_category = cat
+                break
+        
+        # 2. 如果是新大类，创建它
+        if not target_category:
+            target_category = {
+                "name": update.category,
+                "description": f"关于{update.category}的专业服务",
+                "services": []
             }
-
-        # --- 正常对话中 ---
-        latest_msgs = result["messages"][-2:]
-        formatted_exchange = []
-        for m in latest_msgs:
-            role = "expert" if isinstance(m, AIMessage) else "novice"
-            formatted_exchange.append({"role": role, "content": m.content})
-
-        return {
-            "status": "Running",
-            "turn": result["turn_count"],
-            "concluded": False,
-            "latest_exchange": formatted_exchange
-        }
-
+            current_db["taxonomy"].append(target_category)
+        
+        # 3. 注入服务
+        if update.service not in target_category["services"]:
+            target_category["services"].append(update.service)
+            
+            # 4. 写入文件
+            db_path = Path(__file__).parent / "domain_db" / "hr.json"
+            with open(db_path, "w", encoding="utf-8") as f:
+                json.dump(current_db, f, ensure_ascii=False, indent=2)
+            
+            # 5. 刷新内存
+            domain_mgr.load_domain_data()
+            return {"status": "success", "message": f"已添加: {update.service}"}
+        else:
+            return {"status": "skipped", "message": "该服务已存在"}
+            
     except Exception as e:
-        print(f"❌ Graph Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"status": "error", "message": str(e)}
 
-@app.get("/api/knowledge")
-def get_knowledge_graph():
-    data = recorder.get_all()
-    return {"total": len(data), "records": data}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
-def _format_history(msgs):
-    logs = []
-    for m in msgs:
-        role = "Expert (AI)" if isinstance(m, AIMessage) else "Novice (User)"
-        logs.append(f"[{role}]: {m.content}")
-    return logs
+    # ... (保留上面的代码)
+
+# ==========================================
+# 🆕 新增：大类管理接口 (改名 & 删除)
+# ==========================================
+
+class CategoryRename(BaseModel):
+    old_name: str
+    new_name: str
+
+class CategoryDelete(BaseModel):
+    category_name: str
+
+@app.put("/api/taxonomy/category")
+async def rename_category(update: CategoryRename):
+    """修改大类名称"""
+    if not domain_mgr:
+        raise HTTPException(status_code=500, detail="Domain Manager missing")
+    
+    current_db = domain_mgr.domain_db
+    target_cat = next((c for c in current_db["taxonomy"] if c["name"] == update.old_name), None)
+    
+    if target_cat:
+        # 检查新名字是否冲突
+        if any(c["name"] == update.new_name for c in current_db["taxonomy"]):
+            return {"status": "error", "message": "新名称已存在"}
+            
+        target_cat["name"] = update.new_name
+        
+        # 保存并刷新
+        db_path = Path(__file__).parent / "domain_db" / "hr.json"
+        with open(db_path, "w", encoding="utf-8") as f:
+            json.dump(current_db, f, ensure_ascii=False, indent=2)
+        domain_mgr.load_domain_data()
+        
+        return {"status": "success", "message": f"已重命名为: {update.new_name}"}
+    
+    return {"status": "error", "message": "未找到该分类"}
+
+@app.delete("/api/taxonomy/category")
+async def delete_category(delete_req: CategoryDelete):
+    """删除大类 (危险操作：会连带删除下面的服务)"""
+    if not domain_mgr:
+        raise HTTPException(status_code=500, detail="Domain Manager missing")
+        
+    current_db = domain_mgr.domain_db
+    # 过滤掉要删除的那个
+    initial_len = len(current_db["taxonomy"])
+    current_db["taxonomy"] = [c for c in current_db["taxonomy"] if c["name"] != delete_req.category_name]
+    
+    if len(current_db["taxonomy"]) < initial_len:
+        # 保存并刷新
+        db_path = Path(__file__).parent / "domain_db" / "hr.json"
+        with open(db_path, "w", encoding="utf-8") as f:
+            json.dump(current_db, f, ensure_ascii=False, indent=2)
+        domain_mgr.load_domain_data()
+        return {"status": "success", "message": f"已删除: {delete_req.category_name}"}
+        
+    return {"status": "error", "message": "未找到该分类"}
 
 if __name__ == "__main__":
     import uvicorn

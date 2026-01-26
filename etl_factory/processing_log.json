@@ -1,0 +1,12 @@
+[
+  {
+    "file_source": "demo_chat.txt",
+    "novice_intent": "办公室中央空调故障导致员工工作环境恶劣，急需维修",
+    "ground_truth_term": "设施设备紧急维修",
+    "current_ai_response": "抱歉，该问题超出人力资源服务范畴。",
+    "status": "REJECT",
+    "action_required": true,
+    "id": "etl_1769391646",
+    "timestamp": "2026-01-26 09:40:46"
+  }
+]
