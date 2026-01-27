@@ -4,11 +4,11 @@
       "name": "招聘与人才获取 (Talent Acquisition)",
       "description": "关于人才获取、面试流程及入职管理的专业服务",
       "services": [
-        "高端猎头服务 (Executive Search)",
         "灵活用工/兼职招聘 (Flexible Staffing)",
-        "背景调查 (Background Check)",
+        "设施设备紧急维修",
         "RPO招聘流程外包",
-        "设施设备紧急维修"
+        "高端猎头服务 (Executive Search)",
+        "背景调查 (Background Check)"
       ]
     },
     {
@@ -16,16 +16,16 @@
       "description": "处理劳动合同、离职纠纷及法律风险防控",
       "services": [
         "裁员/辞退合规咨询 (Termination Compliance)",
-        "员工手册与规章制度设计",
-        "劳动仲裁应诉代理"
+        "劳动仲裁应诉代理",
+        "员工手册与规章制度设计"
       ]
     },
     {
       "name": "薪酬福利与税务 (Comp & Ben)",
       "description": "设计具有竞争力的薪酬体系与员工福利方案",
       "services": [
-        "薪酬结构设计 (Salary Structure Design)",
         "个税优化/薪税筹划",
+        "薪酬结构设计 (Salary Structure Design)",
         "社保公积金代缴 (Social Security Proxy)"
       ]
     },
@@ -33,8 +33,14 @@
       "name": "组织发展与培训 (OD & TD)",
       "description": "提升员工技能，构建人才梯队",
       "services": [
-        "股权激励方案设计 (ESOP)",
-        "企业内训/领导力培训"
+        "企业内训/领导力培训",
+        "股权激励方案设计 (ESOP)"
+      ]
+    },
+    {
+      "name": "劳动关系与合规",
+      "services": [
+        "裁员/辞退合规咨询"
       ]
     }
   ]

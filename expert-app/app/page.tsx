@@ -20,7 +20,7 @@ export default function Home() {
           </div>
         </header>
 
-        {/* 知识收件箱 */}
+        {/* ETL数据归类 */}
         <section>
           <KnowledgeInbox />
         </section>

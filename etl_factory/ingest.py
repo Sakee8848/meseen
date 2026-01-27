@@ -153,9 +153,25 @@ def process_file(file_path):
     }
     save_report(report)
 
+# ... (上面的 import, extract_prompt, run_mock_exam, process_file 全部保持原样！！！) ...
+
+# ==========================================
+# 4. 运行主程序 (微创升级版：批量扫描)
+# ==========================================
 if __name__ == "__main__":
-    target_file = Path(__file__).parent / "raw_materials" / "demo_chat.txt"
-    if target_file.exists():
-        process_file(target_file)
+    # 定义原料仓库目录
+    raw_dir = Path(__file__).parent / "raw_materials"
+    
+    # 扫描目录下所有的 .txt 文件
+    txt_files = list(raw_dir.glob("*.txt"))
+    
+    if not txt_files:
+        print(f"⚠️ 仓库为空: {raw_dir} 下没有 .txt 文件")
     else:
-        print(f"❌ 找不到文件: {target_file}")
+        print(f"📦 发现 {len(txt_files)} 个文件，开始批量处理...\n")
+        for file_path in txt_files:
+            process_file(file_path)
+            print("\n" + "="*50 + "\n") # 文件之间加个分割线
+            
+    print("🎉 所有文件处理完毕！")
+

@@ -8,5 +8,70 @@
     "action_required": true,
     "id": "etl_1769391646",
     "timestamp": "2026-01-26 09:40:46"
+  },
+  {
+    "file_source": "demo_chat.txt",
+    "novice_intent": "办公室中央空调故障导致员工工作环境恶劣，需要紧急维修服务",
+    "ground_truth_term": "紧急设备维修服务",
+    "current_ai_response": "抱歉，该问题超出人力资源服务范畴。",
+    "status": "REJECT",
+    "action_required": true,
+    "id": "etl_1769398230",
+    "timestamp": "2026-01-26 11:30:30"
+  },
+  {
+    "id": "e0a048e4",
+    "timestamp": "2026-01-26 22:31:36",
+    "status": "pending",
+    "domain": "hr",
+    "query": "我想把不听话的员工开除，但怕赔钱",
+    "ground_truth": "裁员/辞退合规咨询",
+    "ai_prediction": "裁员/辞退合规咨询",
+    "ai_reasoning": "用户面临高额赔偿风险，急需合法裁员方案",
+    "confidence": 100
+  },
+  {
+    "id": "0a912259",
+    "timestamp": "2026-01-26 22:34:27",
+    "status": "pending",
+    "domain": "hr",
+    "query": "我想把不听话的员工开除，但怕赔钱",
+    "ground_truth": "裁员/辞退合规咨询",
+    "ai_prediction": "裁员/辞退合规咨询",
+    "ai_reasoning": "用户面临高额赔偿风险，急需合法裁员方案",
+    "confidence": 100
+  },
+  {
+    "id": "db19a391",
+    "timestamp": "2026-01-26 22:37:08",
+    "status": "pending",
+    "domain": "hr",
+    "query": "我想把不听话的员工开除，但怕赔钱",
+    "ground_truth": "裁员/辞退合规咨询",
+    "ai_prediction": "裁员/辞退合规咨询",
+    "ai_reasoning": "用户面临高额赔偿风险，急需合法裁员方案",
+    "confidence": 100
+  },
+  {
+    "id": "b54f7b9f",
+    "timestamp": "2026-01-26 22:40:38",
+    "status": "pending",
+    "domain": "hr",
+    "query": "我想把不听话的员工开除，但怕赔钱",
+    "ground_truth": "裁员/辞退合规咨询",
+    "ai_prediction": "裁员/辞退合规咨询",
+    "ai_reasoning": "用户面临高额赔偿风险，急需合法裁员方案",
+    "confidence": 100
+  },
+  {
+    "id": "ad7f003c",
+    "timestamp": "2026-01-26 22:56:01",
+    "status": "pending",
+    "domain": "hr",
+    "query": "我想把不听话的员工开除，但怕赔钱",
+    "ground_truth": "裁员/辞退合规咨询",
+    "ai_prediction": "裁员/辞退合规咨询",
+    "ai_reasoning": "用户面临高额赔偿风险，急需合法裁员方案",
+    "confidence": 100
   }
 ]
