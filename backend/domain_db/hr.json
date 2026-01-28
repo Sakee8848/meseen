@@ -17,8 +17,21 @@
       "services": [
         "裁员/辞退合规咨询 (Termination Compliance)",
         "劳动仲裁应诉代理",
-        "员工手册与规章制度设计"
-      ]
+        "员工手册与规章制度设计",
+        "孕期合规"
+      ],
+      "trace_records": {
+        "孕期合规": [
+          {
+            "id": "sim_2f57184c",
+            "timestamp": "2026-01-28T15:09:56.865482",
+            "query": "员工怀孕了，我想让她辞职。",
+            "ai_prediction": "孕期合规",
+            "confidence": 0.95,
+            "source": "simulation_workbench"
+          }
+        ]
+      }
     },
     {
       "name": "薪酬福利与税务 (Comp & Ben)",

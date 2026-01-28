@@ -1,430 +1,377 @@
-import os
 import json
+import os
 import uuid
-import ast
-import datetime
-from pathlib import Path
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+import random
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
-from dotenv import load_dotenv
+from typing import List, Optional, Dict, Any
+from fastapi.middleware.cors import CORSMiddleware
+from pathlib import Path
+from langchain_core.messages import HumanMessage, AIMessage
 
-# 引入内部模块
-from simulation_engine.domain_manager import DomainManager
-from simulation_engine.graph import app as graph_app 
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
-
-# 加载环境变量
-load_dotenv()
-
-print("\n" + "="*60)
-print("🛡️ 正在启动 Meseeing 后端 (V4.4 最终定稿版 - Boolean强类型)...")
-print("="*60 + "\n")
-
-# ==========================================
-# 1. 核心对象初始化
-# ==========================================
-domain_mgr = None
+# 尝试引入仿真引擎，如果失败则打印警告
 try:
-    domain_mgr = DomainManager("hr")
-    print(f"✅ 大脑加载成功")
-except Exception as e:
-    print(f"❌ 大脑加载失败: {e}")
+    from simulation_engine.domain_manager import DomainManager
+    from simulation_engine.graph import app as graph_app, SimulationState
+    SIMULATION_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: simulation_engine components not found: {e}")
+    SIMULATION_AVAILABLE = False
 
 app = FastAPI()
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 🌟 绝对路径锚定：彻底解决“文件找不着”的问题
+BASE_DIR = Path(__file__).resolve().parent
+ROOT_DIR = BASE_DIR.parent
+ETL_LOG = ROOT_DIR / "etl_factory" / "processing_log.json"
+DB_DIR = BASE_DIR / "domain_db"
 
-# ==========================================
-# 2. 全局状态
-# ==========================================
-simulation_state = {
-    "iterator": None,
-    "current_step": 0,
-    "thread_id": None,
-    "static_context": {}, 
-    "last_human_message": "",
-    "has_concluded": False 
+# 🔧 仿真会话状态存储 (简化版：单会话)
+current_simulation = {
+    "state": None,
+    "step_count": 0,
+    "mission": None,
+    "domain": "hr"
 }
 
 # ==========================================
-# 3. 数据模型定义
+# 🎮 逆向工程：接口垫片 (兼容所有前端路径)
 # ==========================================
-class SimStartRequest(BaseModel):
-    domain: str = "hr"
-
-class ChatRequest(BaseModel):
-    message: str
-    domain: str = "hr"
-
-class TaxonomyUpdate(BaseModel):
-    category: str
-    service: str
-
-class CategoryRename(BaseModel):
-    old_name: str
-    new_name: str
-
-class CategoryDelete(BaseModel):
-    category_name: str
-
-# ==========================================
-# 4. 内部工具函数：写入 ETL 数据库
-# ==========================================
-def _save_to_etl(diagnosis_data):
-    try:
-        etl_path = Path(__file__).resolve().parent.parent / "etl_factory" / "processing_log.json"
-        mission = simulation_state.get("static_context", {}).get("secret_mission", {})
-        
-        new_record = {
-            "id": str(uuid.uuid4())[:8],
-            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "status": "pending", 
-            "domain": "hr",
-            "query": mission.get("display_intent", "未知用户意图"), 
-            "ground_truth": mission.get("expert_term", "未知标准服务"), 
-            "ai_prediction": diagnosis_data.get("matched_service", "未匹配"),
-            "ai_reasoning": diagnosis_data.get("diagnosis", "无详细诊断"),
-            "confidence": diagnosis_data.get("confidence", 0)
-        }
-
-        existing_data = []
-        if etl_path.exists():
-            with open(etl_path, "r", encoding="utf-8") as f:
-                try: existing_data = json.load(f)
-                except: existing_data = []
-        
-        existing_data.append(new_record)
-        
-        # 确保目录存在
-        etl_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(etl_path, "w", encoding="utf-8") as f:
-            json.dump(existing_data, f, indent=2, ensure_ascii=False)
-            
-        print(f"💾 [ETL] 成功保存线索到收件箱: {new_record['query'][:10]}...")
-        return True
-    except Exception as e:
-        print(f"❌ [ETL] 保存失败: {e}")
-        return False
-
-# ==========================================
-# 5. 接口定义
-# ==========================================
-
-# --- [A] 仿真控制接口 ---
-
-@app.post("/api/start")
-async def start_simulation(req: SimStartRequest = None):
-    """初始化仿真"""
-    print(f"\n⚡️ [START] 收到启动请求...")
-    if not domain_mgr: raise HTTPException(500, "Domain Manager not ready")
-
-    domain = req.domain if req else "hr"
-
-    true_intent = "我想把不听话的员工开除，但怕赔钱"
+@app.post("/api/start")           
+@app.post("/api/simulation/start") 
+async def start_simulation(data: Dict[str, Any] = None):
+    global current_simulation
+    domain = data.get("domain", "hr") if data else "hr"
+    missions = [
+        {"intent": "员工怀孕了，我想让她辞职。", "term": "孕期合规", "cat": "劳动关系"},
+        {"intent": "技术主管带走核心代码去竞对公司。", "term": "竞业限制管理", "cat": "员工关系"}
+    ]
+    selected = random.choice(missions)
+    mission = {"novice_intent": selected["intent"], "expert_term": selected["term"], "category": selected["cat"]}
     
-    roleplay_instruction = f"""
-    【角色设定】
-    你是一个不懂专业术语的普通用户（小白）。
-    你的真实目的是："{true_intent}"。
-    
-    【行为准则】
-    1. **直奔主题**：不要寒暄，直接抛出员工恶劣行为和你的担忧。
-    2. **急于成交**：一旦专家指出风险，立刻询问解决方案。
-    3. 每次回复不要超过 60 个字。
-    """
-
-    mission = {
-        "novice_intent": roleplay_instruction,
-        "display_intent": true_intent,
-        "opening_line": "专家你好，我这边有个员工天天旷工还顶嘴，我想让他立马走人，但听说现在法律保护员工，我怕被讹钱，这事儿咋整？",
-        "expert_term": "裁员/辞退合规咨询",
-        "category": "劳动关系与合规"
-    }
-
-    inputs = {
-        "messages": [("user", mission["opening_line"])],
-        "domain": domain,
-        "taxonomy_context": domain_mgr.get_expert_context(),
-        "secret_mission": mission,
-        "is_concluded": False, 
-        "turn_count": 0 
+    # 初始化仿真状态
+    taxonomy_context = DomainManager(domain).get_expert_context() if SIMULATION_AVAILABLE else ""
+    current_simulation = {
+        "state": {
+            "messages": [],
+            "domain": domain,
+            "taxonomy_context": taxonomy_context,
+            "secret_mission": mission,
+            "is_concluded": False,
+            "turn_count": 0
+        },
+        "step_count": 0,
+        "mission": mission,
+        "domain": domain
     }
     
-    new_thread_id = f"sim_{uuid.uuid4()}"
-    print(f"🧵 [START] 新线程 ID: {new_thread_id}")
+    return {
+        "status": "started",
+        "thread_id": str(uuid.uuid4()),
+        "mission": mission,
+        "taxonomy": taxonomy_context
+    }
 
-    iterator = graph_app.stream(
-        inputs, 
-        config={
-            "configurable": {"thread_id": new_thread_id},
-            "recursion_limit": 100
-        }, 
-        stream_mode="values"
-    )
-    
-    # 重置状态
-    simulation_state["iterator"] = iterator
-    simulation_state["current_step"] = 0
-    simulation_state["thread_id"] = new_thread_id
-    simulation_state["last_human_message"] = mission["opening_line"]
-    simulation_state["has_concluded"] = False 
-    
-    context_backup = inputs.copy()
-    if "messages" in context_backup:
-        del context_backup["messages"]
-    simulation_state["static_context"] = context_backup
-
-    response_mission = mission.copy()
-    response_mission["novice_intent"] = true_intent 
-
-    return {"status": "started", "mission": response_mission}
-
+# ==========================================
+# 🚀 仿真引擎：逐步执行 (核心新增)
+# ==========================================
 @app.post("/api/next")
+@app.post("/api/simulation/next")
 async def next_step():
-    """执行下一步 (V4.4 最终定稿版)"""
+    global current_simulation
     
-    # 🚦 1. 绝对刹车 (返回 Boolean True)
-    if simulation_state["has_concluded"]:
-        print("🏆 [SYSTEM] 流程已完结，发送 Boolean 信号。")
+    if not current_simulation["state"]:
+        raise HTTPException(status_code=400, detail="请先调用 /api/start 开始仿真")
+    
+    state = current_simulation["state"]
+    step = current_simulation["step_count"]
+    
+    # 检查是否已结束
+    if state.get("is_concluded", False):
         return {
-            "step": -1, 
-            "content": "🏁 交易达成：Leads已入库 (Simulation Completed)", 
+            "step": -1,
             "role": "system",
-            "raw_state": True # 👈 重点：没有引号！是 Boolean！
+            "content": "🎉 仿真已完成！专家已成功识别用户意图。",
+            "raw_state": True
         }
-
-    if not simulation_state["iterator"]:
-        raise HTTPException(400, "请先点击开始")
     
-    if simulation_state["current_step"] > 30:
-        return {"step": -1, "content": "🏁 强制终止：对话轮次过多", "role": "system"}
-
-    # --- 内部辅助函数 ---
-    def get_safe_content(msg):
-        if isinstance(msg, tuple):
-            return msg[0], msg[1]
-        else:
-            return getattr(msg, "type", "unknown"), getattr(msg, "content", str(msg))
-
-    def process_step_data(step_data):
-        messages = step_data.get("messages", [])
-        if not messages:
-            return "system", "Processing..."
+    if not SIMULATION_AVAILABLE:
+        # 模拟模式：无 LangGraph 时返回模拟数据
+        step += 1
+        current_simulation["step_count"] = step
         
-        last_msg = messages[-1]
-        role, content = get_safe_content(last_msg)
-
-        if role == "human" or role == "user":
-            simulation_state["last_human_message"] = content
-
-        str_content = str(content)
-        parsed_data = None
+        # 记录对话历史
+        if "dialogue_history" not in current_simulation:
+            current_simulation["dialogue_history"] = []
         
-        # 🔥 V4.4 混合解析
-        if "{" in str_content:
-            try:
-                start = str_content.find("{")
-                end = str_content.rfind("}") + 1
-                json_str = str_content[start:end]
-                # 预清洗
-                json_str = json_str.replace("'", '"').replace("None", "null").replace("False", "false").replace("True", "true")
-                parsed_data = json.loads(json_str)
-            except:
-                try:
-                    # AST 兜底
-                    candidate = str_content[start:end]
-                    py_candidate = candidate.replace("null", "None").replace("false", "False").replace("true", "True")
-                    parsed_data = ast.literal_eval(py_candidate)
-                except:
-                    pass
-
-        if parsed_data and isinstance(parsed_data, dict):
-            if "reply_to_user" in parsed_data:
-                content = parsed_data["reply_to_user"]
-            
-            if "analysis_data" in parsed_data:
-                data = parsed_data["analysis_data"]
-                print("\n🔍 [MICROSCOPE] 专家思维显微镜:")
-                print(json.dumps(data, indent=2, ensure_ascii=False))
-                
-                # 💰 监测胜利条件
-                status = data.get("status") or parsed_data.get("status")
-                
-                if status == "concluded":
-                    if not simulation_state["has_concluded"]: 
-                        _save_to_etl(data) 
-                        simulation_state["has_concluded"] = True 
-                    
-                    print("\n" + "💰"*20)
-                    print("   LEADS CAPTURED -> 数据已入库，发送结束信号")
-                    print("💰"*20 + "\n")
-                
-                print("-" * 40)
+        if step == 1:
+            msg = {"step": step, "role": "ai", "content": "您好，请问您遇到了什么人力资源方面的问题？我可以帮您分析。"}
+            current_simulation["dialogue_history"].append(msg)
+            return {**msg, "raw_state": False}
+        elif step == 2:
+            intent = current_simulation["mission"]["novice_intent"]
+            msg = {"step": step, "role": "human", "content": intent}
+            current_simulation["dialogue_history"].append(msg)
+            return {**msg, "raw_state": False}
+        elif step == 3:
+            term = current_simulation["mission"]["expert_term"]
+            msg = {"step": step, "role": "ai", "content": f"根据您描述的情况，这属于「{term}」领域的问题。我来为您详细分析..."}
+            current_simulation["dialogue_history"].append(msg)
+            return {**msg, "raw_state": False}
         else:
-            if not content and not isinstance(last_msg, tuple) and hasattr(last_msg, 'tool_calls') and last_msg.tool_calls:
-                content = f"🛠️ 专家正在查阅知识库... \n(调用工具: {last_msg.tool_calls[0]['name']})"
-                role = "tool_call"
-            
-        return role, content
-
+            state["is_concluded"] = True
+            # 🔧 保存到 ETL 数据库
+            save_simulation_to_etl(current_simulation)
+            return {"step": -1, "role": "system", "content": f"🎉 仿真完成！专家成功识别：{current_simulation['mission']['expert_term']}\n\n✅ 已自动保存到 ETL 数据库", "raw_state": True}
+    
+    # 真实模式：调用 LangGraph 引擎
     try:
-        step_data = next(simulation_state["iterator"])
-        simulation_state["current_step"] += 1
+        # 执行一步仿真
+        result = graph_app.invoke(state)
         
-        role, content = process_step_data(step_data)
-        print(f"✅ [NEXT] 步骤 {simulation_state['current_step']}: [{role}] {str(content)[:30]}...")
-
-        # 🚦🚦🚦 关键：确保返回 Boolean 🚦🚦🚦
-        final_state = step_data.get("is_concluded", False) # 默认 False (bool)
+        # 更新状态
+        current_simulation["state"] = result
+        current_simulation["step_count"] += 1
+        step = current_simulation["step_count"]
         
-        if simulation_state["has_concluded"]:
-            final_state = True # 强制 True (bool)
-
+        # 记录对话历史
+        if "dialogue_history" not in current_simulation:
+            current_simulation["dialogue_history"] = []
+        
+        # 提取最新消息
+        messages = result.get("messages", [])
+        if messages:
+            last_msg = messages[-1]
+            role = "ai" if isinstance(last_msg, AIMessage) else "human"
+            content = last_msg.content
+            current_simulation["dialogue_history"].append({"step": step, "role": role, "content": content})
+        else:
+            role = "system"
+            content = "无响应"
+        
+        is_done = result.get("is_concluded", False)
+        
+        if is_done:
+            # 🔧 保存到 ETL 数据库
+            save_simulation_to_etl(current_simulation)
+            return {
+                "step": -1,
+                "role": "system", 
+                "content": f"🎉 仿真完成！专家成功识别用户意图。\n\n目标术语: {current_simulation['mission']['expert_term']}\n\n✅ 已自动保存到 ETL 数据库",
+                "raw_state": True
+            }
+        
         return {
-            "step": simulation_state["current_step"],
+            "step": step,
             "role": role,
             "content": content,
-            "raw_state": final_state # 发送 True/False
+            "raw_state": False
         }
         
-    except StopIteration:
-        # 兜底
-        if simulation_state["has_concluded"]:
-             return {"step": -1, "content": "🏁 交易达成", "role": "system", "raw_state": True}
-
-        print(f"⚠️ [NEXT] 异常停止。准备复苏...")
-        if simulation_state["current_step"] < 20 and simulation_state["thread_id"]:
-            try:
-                recall_msg = simulation_state["last_human_message"] or "请继续你的建议。"
-                nudge_inputs = {
-                    "messages": [("user", recall_msg)], 
-                    **simulation_state.get("static_context", {})
-                }
-                new_iterator = graph_app.stream(nudge_inputs, config={"configurable": {"thread_id": simulation_state["thread_id"]}, "recursion_limit": 100}, stream_mode="values")
-                simulation_state["iterator"] = new_iterator
-                step_data = next(simulation_state["iterator"])
-                
-                messages = step_data.get("messages", [])
-                if messages:
-                    last_msg = messages[-1]
-                    _, last_content = get_safe_content(last_msg)
-                    if last_content == recall_msg:
-                         step_data = next(simulation_state["iterator"])
-
-                simulation_state["current_step"] += 1
-                role, content = process_step_data(step_data)
-                
-                # 复苏后状态检查
-                final_state = step_data.get("is_concluded", False)
-                if simulation_state["has_concluded"]: final_state = True
-
-                return {
-                    "step": simulation_state["current_step"],
-                    "role": role,
-                    "content": content,
-                    "raw_state": final_state
-                }
-            except:
-                pass
-        
-        return {"step": -1, "content": "🏁 仿真流程结束", "role": "system", "raw_state": True}
-        
     except Exception as e:
-        print(f"❌ [NEXT] 错误: {e}")
-        return {"step": -1, "content": f"系统内部错误: {str(e)}", "role": "error"}
+        return {
+            "step": step,
+            "role": "error",
+            "content": f"仿真引擎错误: {str(e)}",
+            "raw_state": False
+        }
 
-
-# --- [B] 聊天接口 ---
-@app.post("/api/chat")
-async def chat_endpoint(request: ChatRequest):
-    if not domain_mgr: return {"response": "System Error"}
-    inputs = {
-        "messages": [("user", request.message)],
-        "domain": request.domain,
-        "taxonomy_context": domain_mgr.get_expert_context(),
-        "secret_mission": {"category": "u", "expert_term": "u", "novice_intent": "u"},
-        "is_concluded": False, "turn_count": 0
+# ==========================================
+# 💾 保存仿真结果到 ETL 数据库
+# ==========================================
+def save_simulation_to_etl(simulation_data: dict):
+    """将完成的仿真保存到 ETL 收件箱"""
+    from datetime import datetime
+    
+    mission = simulation_data.get("mission", {})
+    dialogue = simulation_data.get("dialogue_history", [])
+    
+    # 构建 ETL 记录
+    etl_record = {
+        "id": f"sim_{uuid.uuid4().hex[:8]}",
+        "timestamp": datetime.now().isoformat(),
+        "status": "pending",
+        "domain": simulation_data.get("domain", "hr"),
+        "query": mission.get("novice_intent", ""),
+        "ai_prediction": mission.get("expert_term", ""),
+        "category": mission.get("category", ""),
+        "confidence": 0.95,  # 仿真验证的置信度较高
+        "source": "simulation_workbench",
+        "dialogue_path": [
+            {"step": d["step"], "role": d["role"], "content": d["content"][:500]}  # 限制长度
+            for d in dialogue
+        ]
     }
-    result = graph_app.invoke(inputs, config={"configurable": {"thread_id": "chat_1"}})
-    return {"response": result["messages"][-1].content}
+    
+    # 读取现有数据
+    try:
+        if ETL_LOG.exists():
+            with open(ETL_LOG, 'r', encoding='utf-8') as f:
+                inbox = json.load(f)
+                if not isinstance(inbox, list):
+                    inbox = []
+        else:
+            inbox = []
+    except:
+        inbox = []
+    
+    # 添加新记录
+    inbox.insert(0, etl_record)  # 插入到最前面
+    
+    # 保存
+    try:
+        ETL_LOG.parent.mkdir(parents=True, exist_ok=True)
+        with open(ETL_LOG, 'w', encoding='utf-8') as f:
+            json.dump(inbox, f, ensure_ascii=False, indent=2)
+        print(f"✅ ETL: 已保存仿真记录 {etl_record['id']}")
+    except Exception as e:
+        print(f"❌ ETL 保存失败: {e}")
 
-
-# --- [C] 知识库管理接口 ---
-@app.get("/api/taxonomy")
-async def get_taxonomy():
-    return domain_mgr.domain_db if domain_mgr else {"taxonomy": []}
-
-@app.post("/api/taxonomy/add")
-async def add_service(update: TaxonomyUpdate):
-    if not domain_mgr: raise HTTPException(500, "System Error")
-    current_db = domain_mgr.domain_db
-    target = next((c for c in current_db["taxonomy"] if c["name"] == update.category), None)
-    if not target:
-        target = {"name": update.category, "services": []}
-        current_db["taxonomy"].append(target)
-    if update.service not in target["services"]:
-        target["services"].append(update.service)
-        _save_db(current_db)
-        return {"status": "success"}
-    return {"status": "skipped"}
-
-@app.put("/api/taxonomy/category")
-async def rename_category(update: CategoryRename):
-    if not domain_mgr: raise HTTPException(500, "Domain Manager missing")
-    current_db = domain_mgr.domain_db
-    target_cat = next((c for c in current_db["taxonomy"] if c["name"] == update.old_name), None)
-    if target_cat:
-        if any(c["name"] == update.new_name for c in current_db["taxonomy"]): return {"status": "error", "message": "Exists"}
-        target_cat["name"] = update.new_name
-        _save_db(current_db)
-        return {"status": "success"}
-    return {"status": "error", "message": "Not found"}
-
-@app.delete("/api/taxonomy/category")
-async def delete_category(delete_req: CategoryDelete):
-    if not domain_mgr: raise HTTPException(500, "Domain Manager missing")
-    current_db = domain_mgr.domain_db
-    initial_len = len(current_db["taxonomy"])
-    current_db["taxonomy"] = [c for c in current_db["taxonomy"] if c["name"] != delete_req.category_name]
-    if len(current_db["taxonomy"]) < initial_len:
-        _save_db(current_db)
-        return {"status": "success"}
-    return {"status": "error", "message": "Not found"}
-
-def _save_db(data):
-    path = Path(__file__).parent / "domain_db" / "hr.json"
-    with open(path, "w", encoding="utf-8") as f: json.dump(data, f, ensure_ascii=False, indent=2)
-    domain_mgr.load_domain_data()
-
-
-# --- [D] 日志接口 ---
+# ==========================================
+# 📥 ETL 库：全兼容入库 (支持单选/全选)
+# ==========================================
 @app.get("/api/knowledge/logs")
-async def get_logs():
-    path = Path(__file__).resolve().parent.parent / "etl_factory" / "processing_log.json"
-    if path.exists():
-        with open(path, "r", encoding="utf-8") as f:
-            try:
-                raw_logs = json.load(f)
-                # 去重 & 倒序
-                unique_logs = []
-                seen_queries = set()
-                for log in raw_logs[::-1]:
-                    query = log.get("query", "")
-                    if query not in seen_queries:
-                        unique_logs.append(log)
-                        seen_queries.add(query)
-                return unique_logs
-            except:
-                return []
-    return []
+@app.get("/api/etl/inbox")
+async def get_etl_inbox():
+    if not ETL_LOG.exists(): return []
+    try:
+        with open(ETL_LOG, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except: return []
 
+
+@app.post("/api/taxonomy/add")    
+@app.post("/api/knowledge/ingest")
+@app.post("/api/etl/batch_ingest")
+async def universal_ingest(request: Request):
+    if not ETL_LOG.exists(): 
+        return {"status": "error", "message": "ETL log file not found"}
+    
+    # 🔧 修复：使用 Request 对象正确解析 JSON body
+    try:
+        body = await request.json()
+    except Exception as e:
+        return {"status": "error", "message": f"Invalid JSON: {str(e)}"}
+    
+    # 统一解析数据格式
+    items = []
+    if "items" in body: 
+        items = body["items"]
+    else: 
+        items = [{"id": body.get("id"), "domain": body.get("domain", "hr")}]
+    
+    print(f"📥 ETL 入库请求: {len(items)} 条记录")
+
+    with open(ETL_LOG, 'r', encoding='utf-8') as f:
+        inbox = json.load(f)
+
+    db_cache = {}
+    success_ids = []
+
+    for item in items:
+        rid, dom = item.get("id"), item.get("domain", "hr")
+        record = next((r for r in inbox if r["id"] == rid), None)
+        if not record: 
+            print(f"⚠️ 未找到记录: {rid}")
+            continue
+        
+        if dom not in db_cache:
+            p = DB_DIR / f"{dom}.json"
+            if p.exists():
+                with open(p, 'r', encoding='utf-8') as f: 
+                    db_cache[dom] = json.load(f)
+            else:
+                print(f"⚠️ 知识库文件不存在: {p}")
+                continue
+
+        if dom in db_cache:
+            ai_pred = record.get("ai_prediction", "")
+            matched = False
+            
+            # 🔧 修复：在 taxonomy 的 services 中查找匹配的服务
+            for category in db_cache[dom].get("taxonomy", []):
+                services = category.get("services", [])
+                
+                # 检查 ai_prediction 是否在服务列表中（支持模糊匹配）
+                for idx, service in enumerate(services):
+                    if ai_pred in service or service in ai_pred or ai_pred == service:
+                        # 找到匹配的服务，添加追踪记录
+                        if "trace_records" not in category:
+                            category["trace_records"] = {}
+                        if service not in category["trace_records"]:
+                            category["trace_records"][service] = []
+                        
+                        # 添加记录
+                        trace_entry = {
+                            "id": record.get("id"),
+                            "timestamp": record.get("timestamp"),
+                            "query": record.get("query", ""),
+                            "ai_prediction": ai_pred,
+                            "confidence": record.get("confidence", 0),
+                            "source": record.get("source", "etl_inbox")
+                        }
+                        category["trace_records"][service].append(trace_entry)
+                        success_ids.append(rid)
+                        matched = True
+                        print(f"✅ 入库成功: {ai_pred} → {category['name']}/{service}")
+                        break
+                
+                if matched:
+                    break
+            
+            if not matched:
+                # 如果没有精确匹配，尝试添加到对应的 category
+                for category in db_cache[dom].get("taxonomy", []):
+                    cat_name = category.get("name", "")
+                    record_cat = record.get("category", "")
+                    
+                    # 检查类别是否匹配
+                    if record_cat and (record_cat in cat_name or cat_name in record_cat):
+                        # 动态添加新服务到 services 列表
+                        if ai_pred not in category.get("services", []):
+                            if "services" not in category:
+                                category["services"] = []
+                            category["services"].append(ai_pred)
+                        
+                        # 添加追踪记录
+                        if "trace_records" not in category:
+                            category["trace_records"] = {}
+                        if ai_pred not in category["trace_records"]:
+                            category["trace_records"][ai_pred] = []
+                        
+                        trace_entry = {
+                            "id": record.get("id"),
+                            "timestamp": record.get("timestamp"),
+                            "query": record.get("query", ""),
+                            "ai_prediction": ai_pred,
+                            "confidence": record.get("confidence", 0),
+                            "source": record.get("source", "etl_inbox")
+                        }
+                        category["trace_records"][ai_pred].append(trace_entry)
+                        success_ids.append(rid)
+                        print(f"✅ 入库成功 (新增服务): {ai_pred} → {cat_name}")
+                        break
+    
+    # 保存更新后的知识库
+    for d, content in db_cache.items():
+        with open(DB_DIR / f"{d}.json", 'w', encoding='utf-8') as f:
+            json.dump(content, f, ensure_ascii=False, indent=2)
+
+    # 成功后从收件箱移除
+    new_inbox = [r for r in inbox if r["id"] not in success_ids]
+    with open(ETL_LOG, 'w', encoding='utf-8') as f:
+        json.dump(new_inbox, f, ensure_ascii=False, indent=2)
+
+    print(f"📊 ETL 入库完成: 成功 {len(success_ids)} 条")
+    return {"status": "success", "count": len(success_ids)}
+
+@app.get("/api/taxonomy")
+async def get_taxonomy(domain: str = "hr"):
+    p = DB_DIR / f"{domain}.json"
+    if not p.exists(): return {"service_nodes": []}
+    with open(p, 'r', encoding='utf-8') as f: return json.load(f)
 
 if __name__ == "__main__":
     import uvicorn

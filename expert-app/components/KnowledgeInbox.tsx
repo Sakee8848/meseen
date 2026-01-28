@@ -20,10 +20,14 @@ export const KnowledgeInbox: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTerm, setSelectedTerm] = useState("");
 
+  // 🌟 自动识别 API 地址，兼容本地和 Docker 环境
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/knowledge/logs");
+      // 对齐强壮版后端接口
+      const res = await fetch(`${API_BASE}/api/etl/inbox`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setLogs(data);
@@ -46,31 +50,38 @@ export const KnowledgeInbox: React.FC = () => {
 
   const handleDirectImport = async (log: LogItem) => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/taxonomy/add", {
+      // 🌟 核心修正：封装为后端要求的批量 items 格式，彻底解决 422 报错
+      const res = await fetch(`${API_BASE}/api/etl/batch_ingest`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          category: "劳动关系与合规", 
-          service: log.ai_prediction  
+          items: [
+            { 
+              id: log.id, 
+              domain: log.domain || "hr" 
+            }
+          ]
         })
       });
 
       const result = await res.json();
-      if (result.status === "success" || result.status === "skipped") {
-        // 1. 本地状态更新：让按钮立刻变灰
+      if (result.status === "success") {
+        // 1. 本地状态更新
         setLogs(prevLogs => 
           prevLogs.map(item => 
             item.id === log.id ? { ...item, status: 'imported' } : item
           )
         );
 
-        // 2. 发射信号弹：告诉星图“该刷新了！”
+        // 2. 发射刷新信号给星图
         window.dispatchEvent(new Event('taxonomyUpdated'));
-        
-        // alert(`✅ 成功入库知识节点：[${log.ai_prediction}]`);
+      } else {
+        console.error("入库失败回复:", result);
+        alert(`入库失败: ${result.message || "后端逻辑异常"}`);
       }
     } catch (err) {
-      alert("入库失败，请检查后端连接");
+      console.error("Network Error:", err);
+      alert("无法连接服务器，请确保 Docker 容器或后端已启动");
     }
   };
 
@@ -84,13 +95,15 @@ export const KnowledgeInbox: React.FC = () => {
               待处理: {logs.filter(l => l.status === 'pending').length}
             </span>
           </h2>
-          <button 
-            onClick={fetchLogs}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            title="刷新列表"
-          >
-            <RefreshCw size={20} className={loading ? "animate-spin text-blue-500" : "text-gray-500"} />
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={fetchLogs}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              title="刷新列表"
+            >
+              <RefreshCw size={20} className={loading ? "animate-spin text-blue-500" : "text-gray-500"} />
+            </button>
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -104,7 +117,7 @@ export const KnowledgeInbox: React.FC = () => {
                 key={log.id} 
                 className={`group p-4 rounded-lg border-l-4 transition-all hover:shadow-md bg-white border border-gray-100 ${
                   log.status === 'rejected' ? 'border-l-red-500' : 
-                  log.status === 'imported' ? 'border-l-gray-300 opacity-60' : // 已入库变灰
+                  log.status === 'imported' ? 'border-l-gray-300 opacity-60' : 
                   'border-l-emerald-500' 
                 }`}
               >
@@ -119,6 +132,7 @@ export const KnowledgeInbox: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">RAW QUERY (User)</span>
+                        <span className="text-[10px] text-gray-300 ml-2">ID: {log.id}</span>
                       </div>
                       <p className="text-sm text-gray-800 font-medium">"{log.query}"</p>
                     </div>
@@ -127,7 +141,7 @@ export const KnowledgeInbox: React.FC = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">AI PREDICTION</span>
                         <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 rounded">
-                          {log.confidence}% 置信度
+                          {log.domain === 'hr' ? 'HR服务体系' : '物业保险体系'}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -179,7 +193,7 @@ export const KnowledgeInbox: React.FC = () => {
         initialTerm={selectedTerm}
         onSuccess={() => {
             fetchLogs();
-            window.dispatchEvent(new Event('taxonomyUpdated')); // 修正后也刷新星图
+            window.dispatchEvent(new Event('taxonomyUpdated'));
         }}
       />
     </>
