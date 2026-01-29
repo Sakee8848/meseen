@@ -373,6 +373,79 @@ async def get_taxonomy(domain: str = "hr"):
     if not p.exists(): return {"service_nodes": []}
     with open(p, 'r', encoding='utf-8') as f: return json.load(f)
 
+# ==========================================
+# 📊 知识库覆盖率统计 API
+# ==========================================
+@app.get("/api/coverage")
+async def get_coverage(domain: str = "hr"):
+    """获取知识库覆盖率统计"""
+    try:
+        from simulation_engine.coverage_calculator import get_coverage_stats
+        return get_coverage_stats(domain)
+    except ImportError as e:
+        print(f"Warning: coverage_calculator not available: {e}")
+        return {
+            "coverage_rate": 0,
+            "covered_count": 0,
+            "estimated_total": 17280,
+            "error": "覆盖率计算模块不可用"
+        }
+
+# ==========================================
+# 🤖 批量 AI 互博控制 API
+# ==========================================
+try:
+    from batch_runner_v3 import batch_runner
+    BATCH_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: batch_runner_v3 not available: {e}")
+    BATCH_AVAILABLE = False
+
+@app.post("/api/batch/start")
+async def batch_start(request: Request):
+    """启动批量 AI 互博任务"""
+    if not BATCH_AVAILABLE:
+        return {"status": "error", "message": "批量引擎不可用"}
+    
+    try:
+        body = await request.json()
+    except:
+        body = {}
+    
+    batch_size = body.get("batch_size", 5)
+    domain = body.get("domain", "hr")
+    
+    result = batch_runner.start(batch_size, domain)
+    return result
+
+@app.post("/api/batch/pause")
+async def batch_pause():
+    """暂停批量任务"""
+    if not BATCH_AVAILABLE:
+        return {"status": "error", "message": "批量引擎不可用"}
+    return batch_runner.pause()
+
+@app.post("/api/batch/resume")
+async def batch_resume():
+    """恢复批量任务"""
+    if not BATCH_AVAILABLE:
+        return {"status": "error", "message": "批量引擎不可用"}
+    return batch_runner.resume()
+
+@app.post("/api/batch/cancel")
+async def batch_cancel():
+    """取消批量任务"""
+    if not BATCH_AVAILABLE:
+        return {"status": "error", "message": "批量引擎不可用"}
+    return batch_runner.cancel()
+
+@app.get("/api/batch/status")
+async def batch_status():
+    """获取批量任务状态"""
+    if not BATCH_AVAILABLE:
+        return {"status": "error", "message": "批量引擎不可用", "state": "unavailable"}
+    return batch_runner.get_status()
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

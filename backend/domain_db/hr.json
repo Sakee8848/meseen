@@ -9,7 +9,330 @@
         "RPO招聘流程外包",
         "高端猎头服务 (Executive Search)",
         "背景调查 (Background Check)"
-      ]
+      ],
+      "trace_records": {
+        "灵活用工/兼职招聘 (Flexible Staffing)": [
+          {
+            "id": "batch_2a85dc76",
+            "timestamp": "2026-01-29T13:50:13.011000",
+            "query": "我是个小老板，年底太忙了，能不能临时找点人",
+            "ai_prediction": "灵活用工/兼职招聘",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "创业老板",
+            "tone": "急躁",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是创业老板，我是个小老板，年底太忙了，能不能临时找点人"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。您是想招长期员工还是临时工？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。大概需要招多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「灵活用工/兼职招聘」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "灵活用工/兼职招聘"
+          },
+          {
+            "id": "batch_1238942d",
+            "timestamp": "2026-01-29T14:44:06.082891",
+            "query": "我们是个初创团队，气死我了！年底太忙了，能不能临时找点人",
+            "ai_prediction": "灵活用工/兼职招聘",
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "初创团队负责人",
+            "tone": "迷茫",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，我们是个初创团队，气死我了！年底太忙了，能不能临时找点人"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。是什么岗位？技术还是运营？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "都需要，主要是能干活就行"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。大概需要招多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "先招个三五个吧，看看情况"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「灵活用工/兼职招聘」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "灵活用工/兼职招聘"
+          }
+        ],
+        "RPO招聘流程外包": [
+          {
+            "id": "batch_9a7907bf",
+            "timestamp": "2026-01-29T14:25:39.047308",
+            "query": "我是个小老板，完全不懂这个，校招季人太多了，我一个人搞不定",
+            "ai_prediction": "RPO招聘流程外包",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "创业老板",
+            "tone": "急躁",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是创业老板，我是个小老板，完全不懂这个，校招季人太多了，我一个人搞不定"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。您是想招长期员工还是临时工？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。大概需要招多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「RPO招聘流程外包」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "RPO招聘流程外包"
+          },
+          {
+            "id": "batch_26ad4b3d",
+            "timestamp": "2026-01-29T14:25:42.092435",
+            "query": "我们是个初创团队，已经拖了很久了，校招季人太多了，我一个人搞不定",
+            "ai_prediction": "RPO招聘流程外包",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "初创团队负责人",
+            "tone": "迷茫",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是初创团队负责人，我们是个初创团队，已经拖了很久了，校招季人太多了，我一个人搞不定"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。您是想招长期员工还是临时工？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "这个我不太清楚，反正情况就是这样"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。大概需要招多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「RPO招聘流程外包」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "RPO招聘流程外包"
+          },
+          {
+            "id": "batch_4c640864",
+            "timestamp": "2026-01-29T14:29:50.727569",
+            "query": "我们是个初创团队，气死我了！已经拖了很久了，校招季人太多了，我一个人搞不定",
+            "ai_prediction": "RPO招聘流程外包",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "初创团队负责人",
+            "tone": "迷茫",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是初创团队负责人，我们是个初创团队，气死我了！已经拖了很久了，校招季人太多了，我一个人搞不定"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。您是想招长期员工还是临时工？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "这个我不太清楚，反正情况就是这样"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。大概需要招多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「RPO招聘流程外包」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "RPO招聘流程外包"
+          },
+          {
+            "id": "batch_50cc21c0",
+            "timestamp": "2026-01-29T14:44:04.057718",
+            "query": "我在外资公司担任高管，不知道该怎么办，校招季人太多了，我一个人搞不定",
+            "ai_prediction": "RPO招聘流程外包",
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "外企高管",
+            "tone": "谨慎",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，我在外资公司担任高管，不知道该怎么办，校招季人太多了，我一个人搞不定"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。您是想招长期员工还是临时工？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "临时的，就最近忙不过来"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。大概需要招多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "先招个三五个吧，看看情况"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「RPO招聘流程外包」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "RPO招聘流程外包"
+          }
+        ],
+        "设施设备紧急维修": [
+          {
+            "id": "batch_367bb08d",
+            "timestamp": "2026-01-29T14:44:03.045945",
+            "query": "我是个小老板，真的很头疼，公司空调坏了7天了，员工都要热死了",
+            "ai_prediction": "设施设备紧急维修",
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "创业老板",
+            "tone": "急躁",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，我是个小老板，真的很头疼，公司空调坏了7天了，员工都要热死了"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。您是想招长期员工还是临时工？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "临时的，就最近忙不过来"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。大概需要招多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "先招个三五个吧，看看情况"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「设施设备紧急维修」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "设施设备紧急维修"
+          }
+        ]
+      }
     },
     {
       "name": "劳动关系与合规 (Employee Relations & Compliance)",
@@ -18,17 +341,333 @@
         "裁员/辞退合规咨询 (Termination Compliance)",
         "劳动仲裁应诉代理",
         "员工手册与规章制度设计",
-        "孕期合规"
+        "孕期合规",
+        "劳动关系合规",
+        "保密协议与商业秘密",
+        "竞业限制管理"
       ],
       "trace_records": {
+        "裁员/辞退合规咨询 (Termination Compliance)": [
+          {
+            "id": "batch_11a38d0d",
+            "timestamp": "2026-01-29T13:50:12.002030",
+            "query": "我是个小老板，之前吃过亏，下周就要解决，有个员工我不想用了，想让他走",
+            "ai_prediction": "裁员/辞退合规咨询",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "创业老板",
+            "tone": "急躁",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是创业老板，我是个小老板，之前吃过亏，下周就要解决，有个员工我不想用了，想让他走"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。这个员工是试用期还是正式的？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "这个我不太清楚，反正情况就是这样"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是男员工还是女员工？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「裁员/辞退合规咨询」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "裁员/辞退合规咨询"
+          },
+          {
+            "id": "batch_5351c419",
+            "timestamp": "2026-01-29T14:25:38.033626",
+            "query": "我是一名普通员工，朋友公司被坑过，公司要减少一些人，不知道怎么弄",
+            "ai_prediction": "裁员/辞退合规咨询",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "普通员工",
+            "tone": "迷茫",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是普通员工，我是一名普通员工，朋友公司被坑过，公司要减少一些人，不知道怎么弄"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。这个员工是试用期还是正式的？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是男员工还是女员工？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「裁员/辞退合规咨询」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "裁员/辞退合规咨询"
+          },
+          {
+            "id": "batch_2c936708",
+            "timestamp": "2026-01-29T14:29:51.740132",
+            "query": "我是一名普通员工，越快越好，有个员工我不想用了，想让他走",
+            "ai_prediction": "裁员/辞退合规咨询",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "普通员工",
+            "tone": "迷茫",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是普通员工，我是一名普通员工，越快越好，有个员工我不想用了，想让他走"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。这个员工是试用期还是正式的？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是男员工还是女员工？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「裁员/辞退合规咨询」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "裁员/辞退合规咨询"
+          }
+        ],
+        "竞业限制管理": [
+          {
+            "id": "batch_6bd02b53",
+            "timestamp": "2026-01-29T13:50:14.019606",
+            "query": "我在外资公司担任高管，核心员工跑了，把东西都带走了",
+            "ai_prediction": "竞业限制管理",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "外企高管",
+            "tone": "谨慎",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是外企高管，我在外资公司担任高管，核心员工跑了，把东西都带走了"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。这个员工是试用期还是正式的？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "这个我不太清楚，反正情况就是这样"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是男员工还是女员工？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「竞业限制管理」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "竞业限制管理"
+          },
+          {
+            "id": "batch_52313a59",
+            "timestamp": "2026-01-29T14:25:40.059300",
+            "query": "我是个小老板，不知道该怎么办，已经拖了很久了，核心员工跑了，把东西都带走了",
+            "ai_prediction": "竞业限制管理",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "创业老板",
+            "tone": "急躁",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是创业老板，我是个小老板，不知道该怎么办，已经拖了很久了，核心员工跑了，把东西都带走了"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。这个员工是试用期还是正式的？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是男员工还是女员工？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「竞业限制管理」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "竞业限制管理"
+          }
+        ],
+        "劳动仲裁应诉代理": [
+          {
+            "id": "batch_c2384afa",
+            "timestamp": "2026-01-29T14:29:52.753276",
+            "query": "我是部门主管，已经拖了很久了，有个员工告我了，我该怎么应对",
+            "ai_prediction": "劳动仲裁应诉代理",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "部门主管",
+            "tone": "焦虑",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是部门主管，我是部门主管，已经拖了很久了，有个员工告我了，我该怎么应对"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。这个员工是试用期还是正式的？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是男员工还是女员工？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「劳动仲裁应诉代理」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "劳动仲裁应诉代理"
+          }
+        ],
         "孕期合规": [
           {
-            "id": "sim_2f57184c",
-            "timestamp": "2026-01-28T15:09:56.865482",
-            "query": "员工怀孕了，我想让她辞职。",
+            "id": "batch_aaeeb559",
+            "timestamp": "2026-01-29T14:44:05.070332",
+            "query": "作为公司HR，急死了！有个女员工老是请假，干活也不行",
             "ai_prediction": "孕期合规",
-            "confidence": 0.95,
-            "source": "simulation_workbench"
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "HR经理",
+            "tone": "专业",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，作为公司HR，急死了！有个女员工老是请假，干活也不行"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。之前有没有给过书面警告？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "口头说过几次，书面的好像没有"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。是什么原因想让他离开？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是工作态度不好，老是出问题"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「孕期合规」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "孕期合规"
           }
         ]
       }
@@ -39,16 +678,533 @@
       "services": [
         "个税优化/薪税筹划",
         "薪酬结构设计 (Salary Structure Design)",
-        "社保公积金代缴 (Social Security Proxy)"
-      ]
+        "社保公积金代缴 (Social Security Proxy)",
+        "员工福利方案设计"
+      ],
+      "trace_records": {
+        "薪酬结构设计 (Salary Structure Design)": [
+          {
+            "id": "batch_14e89388",
+            "timestamp": "2026-01-29T13:50:09.984482",
+            "query": "我是部门主管，这事儿愁死我了，公司工资乱七八糟的，想整理一下",
+            "ai_prediction": "薪酬结构设计",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "部门主管",
+            "tone": "焦虑",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是部门主管，我是部门主管，这事儿愁死我了，公司工资乱七八糟的，想整理一下"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。您是想优化工资结构还是福利方案？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "差不多就是这个情况"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。大概涉及多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「薪酬结构设计」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "薪酬结构设计"
+          },
+          {
+            "id": "batch_445b8d5d",
+            "timestamp": "2026-01-29T14:29:54.775197",
+            "query": "我刚毕业入职，马上要出问题了，公司工资乱七八糟的，想整理一下",
+            "ai_prediction": "薪酬结构设计",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "应届毕业生",
+            "tone": "紧张",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是应届毕业生，我刚毕业入职，马上要出问题了，公司工资乱七八糟的，想整理一下"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。您是想优化工资结构还是福利方案？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。大概涉及多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「薪酬结构设计」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "薪酬结构设计"
+          }
+        ],
+        "员工福利方案设计": [
+          {
+            "id": "batch_b4603b50",
+            "timestamp": "2026-01-29T14:10:26.332670",
+            "query": "在公司干了十几年，真的很头疼，下周就要解决，想给员工发点福利，不知道怎么弄",
+            "ai_prediction": "员工福利方案设计",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "资深员工",
+            "tone": "愤怒",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是资深员工，在公司干了十几年，真的很头疼，下周就要解决，想给员工发点福利，不知道怎么弄"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。您是想优化工资结构还是福利方案？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。大概涉及多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「员工福利方案设计」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "员工福利方案设计"
+          }
+        ],
+        "个税优化/薪税筹划": [
+          {
+            "id": "batch_6ea6193b",
+            "timestamp": "2026-01-29T14:10:29.363159",
+            "query": "我是一名普通员工，年底要发钱，怎么发最划算",
+            "ai_prediction": "个税优化/薪税筹划",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "普通员工",
+            "tone": "迷茫",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是普通员工，我是一名普通员工，年底要发钱，怎么发最划算"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。您是想优化工资结构还是福利方案？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "这个我不太清楚，反正情况就是这样"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。大概涉及多少人？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「个税优化/薪税筹划」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "个税优化/薪税筹划"
+          }
+        ]
+      }
     },
     {
       "name": "组织发展与培训 (OD & TD)",
       "description": "提升员工技能，构建人才梯队",
       "services": [
         "企业内训/领导力培训",
-        "股权激励方案设计 (ESOP)"
-      ]
+        "股权激励方案设计 (ESOP)",
+        "组织架构设计",
+        "员工敬业度提升",
+        "职级体系设计"
+      ],
+      "trace_records": {
+        "企业内训/领导力培训": [
+          {
+            "id": "batch_784725ac",
+            "timestamp": "2026-01-29T13:50:10.993843",
+            "query": "我是部门主管，朋友公司被坑过，越快越好，管理层水平太差，想提升一下",
+            "ai_prediction": "企业内训/领导力培训",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "部门主管",
+            "tone": "焦虑",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是部门主管，我是部门主管，朋友公司被坑过，越快越好，管理层水平太差，想提升一下"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。公司现在大概多少人？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "差不多就是这个情况"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是想留住核心员工还是提升团队能力？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「企业内训/领导力培训」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "企业内训/领导力培训"
+          },
+          {
+            "id": "batch_fc8a9943",
+            "timestamp": "2026-01-29T14:10:27.342056",
+            "query": "我是个小老板，不知道该怎么办，管理层水平太差，想提升一下",
+            "ai_prediction": "企业内训/领导力培训",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "创业老板",
+            "tone": "急躁",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是创业老板，我是个小老板，不知道该怎么办，管理层水平太差，想提升一下"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。公司现在大概多少人？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是想留住核心员工还是提升团队能力？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「企业内训/领导力培训」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "企业内训/领导力培训"
+          },
+          {
+            "id": "batch_abb7c286",
+            "timestamp": "2026-01-29T14:10:28.352328",
+            "query": "我是个小老板，管理层水平太差，想提升一下",
+            "ai_prediction": "企业内训/领导力培训",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "创业老板",
+            "tone": "急躁",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是创业老板，我是个小老板，管理层水平太差，想提升一下"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。公司现在大概多少人？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "这个我不太清楚，反正情况就是这样"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是想留住核心员工还是提升团队能力？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「企业内训/领导力培训」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "企业内训/领导力培训"
+          }
+        ],
+        "职级体系设计": [
+          {
+            "id": "batch_4aa88465",
+            "timestamp": "2026-01-29T14:10:25.321400",
+            "query": "我是一名普通员工，这事儿拖不得，下周就要解决，员工没有晋升空间，都不想干了",
+            "ai_prediction": "职级体系设计",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "普通员工",
+            "tone": "迷茫",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是普通员工，我是一名普通员工，这事儿拖不得，下周就要解决，员工没有晋升空间，都不想干了"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。公司现在大概多少人？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是想留住核心员工还是提升团队能力？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「职级体系设计」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "职级体系设计"
+          },
+          {
+            "id": "batch_516fd8a0",
+            "timestamp": "2026-01-29T14:44:07.097813",
+            "query": "我在外资公司担任高管，员工没有晋升空间，都不想干了",
+            "ai_prediction": "职级体系设计",
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "外企高管",
+            "tone": "谨慎",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，我在外资公司担任高管，员工没有晋升空间，都不想干了"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。有没有考虑做系统的培训？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "想过，但不知道从哪入手"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。主要是哪方面的问题？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "感觉管理跟不上，效率越来越低"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「职级体系设计」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "职级体系设计"
+          }
+        ],
+        "股权激励方案设计 (ESOP)": [
+          {
+            "id": "batch_25f600d8",
+            "timestamp": "2026-01-29T14:25:41.079735",
+            "query": "我是部门主管，核心员工老想跳槽，怎么留住人",
+            "ai_prediction": "股权激励方案设计",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "部门主管",
+            "tone": "焦虑",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是部门主管，我是部门主管，核心员工老想跳槽，怎么留住人"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。公司现在大概多少人？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是想留住核心员工还是提升团队能力？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「股权激励方案设计」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "股权激励方案设计"
+          }
+        ],
+        "员工敬业度提升": [
+          {
+            "id": "batch_b9a24854",
+            "timestamp": "2026-01-29T14:29:53.764044",
+            "query": "我刚毕业入职，这事儿拖不得，最近员工士气很低，离职率也高",
+            "ai_prediction": "员工敬业度提升",
+            "confidence": 0.75,
+            "source": "batch_ai_battle_v6",
+            "persona": "应届毕业生",
+            "tone": "紧张",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "我是应届毕业生，我刚毕业入职，这事儿拖不得，最近员工士气很低，离职率也高"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "了解。公司现在大概多少人？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "对，就是这样的"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "好的。是想留住核心员工还是提升团队能力？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是这样，你看该怎么办"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这属于「员工敬业度提升」类型的问题。我们可以提供专业的解决方案..."
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "员工敬业度提升"
+          }
+        ]
+      }
     },
     {
       "name": "劳动关系与合规",

@@ -6,12 +6,13 @@ import KnowledgeGalaxy from "../components/KnowledgeGalaxy";
 
 // 👇 2. 新组件（我们写的是 export const），必须保留花括号 {}
 import { KnowledgeInbox } from "../components/KnowledgeInbox";
+import { BatchControlPanel } from "../components/BatchControlPanel";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 p-8 flex flex-col gap-8">
       <div className="max-w-6xl mx-auto w-full space-y-8">
-        
+
         {/* 顶部标题 */}
         <header className="flex justify-between items-end border-b pb-4">
           <div>
@@ -37,6 +38,11 @@ export default function Home() {
             <KnowledgeGalaxy />
           </div>
         </div>
+
+        {/* 批量 AI 互博引擎 */}
+        <section>
+          <BatchControlPanel />
+        </section>
 
       </div>
     </main>
