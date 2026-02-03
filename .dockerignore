@@ -1,0 +1,54 @@
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+*.egg-info/
+.eggs/
+*.egg
+.pytest_cache/
+
+# Node.js
+node_modules/
+.next/
+out/
+.npm
+*.log
+npm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Environment
+.env.local
+.env*.local
+
+# Documentation
+*.md
+!README.md
+
+# Test
+coverage/
+.coverage
+htmlcov/

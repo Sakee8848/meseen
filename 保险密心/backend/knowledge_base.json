@@ -1,0 +1,32 @@
+{
+    "taxonomy": [
+        {
+            "name": "【个险/寿险】家庭保障体系",
+            "services": [
+                "重疾险 (Critical Illness Insurance)",
+                "定期寿险 (Term Life)",
+                "百万医疗险 (Million Medical)",
+                "高端医疗服务 (High-end Medical)",
+                "终身寿险 (Whole Life)"
+            ]
+        },
+        {
+            "name": "【团险/福利】企业员工保障",
+            "services": [
+                "团体补充医疗 (Group Supplemental Medical)",
+                "雇主责任险 (Employer Liability)",
+                "员工子女保险 (Employee Child Insurance)",
+                "弹性福利计划 (Flexible Benefit Plans)"
+            ]
+        },
+        {
+            "name": "【财险/意外】风险规避",
+            "services": [
+                "综合意外险 (Accident Insurance)",
+                "交通意外保险 (Travel/Traffic Accident)",
+                "家财险 (Home Property)",
+                "公众责任险 (Public Liability)"
+            ]
+        }
+    ]
+}

@@ -101,6 +101,51 @@
             "total_turns": 6,
             "diagnosis_correct": true,
             "ground_truth": "灵活用工/兼职招聘"
+          },
+          {
+            "id": "batch_bc21ea57",
+            "timestamp": "2026-02-03T16:16:54.990190",
+            "query": "我们是个初创团队，最近忙不过来，想找几个人帮忙干活",
+            "ai_prediction": "灵活用工/兼职招聘",
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "初创团队负责人",
+            "tone": "迷茫",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，我们是个初创团队，最近忙不过来，想找几个人帮忙干活"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。大概需要招多少人？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "先招个三五个吧，看看情况"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。是什么岗位？技术还是运营？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "都需要，主要是能干活就行"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「灵活用工/兼职招聘」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "灵活用工/兼职招聘"
           }
         ],
         "RPO招聘流程外包": [
@@ -330,6 +375,53 @@
             "total_turns": 6,
             "diagnosis_correct": true,
             "ground_truth": "设施设备紧急维修"
+          }
+        ],
+        "背景调查 (Background Check)": [
+          {
+            "id": "batch_8ac10499",
+            "timestamp": "2026-02-03T16:16:57.007882",
+            "query": "作为公司HR，真的很头疼，下周就要解决，有个人想来我们公司，但他的简历看起来太好了",
+            "ai_prediction": "背景调查",
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "HR经理",
+            "tone": "专业",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，作为公司HR，真的很头疼，下周就要解决，有个人想来我们公司，但他的简历看起来太好了"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。大概需要招多少人？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "先招个三五个吧，看看情况"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。您是想招长期员工还是临时工？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "临时的，就最近忙不过来"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「背景调查」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "背景调查"
           }
         ]
       }
@@ -669,6 +761,98 @@
             "diagnosis_correct": true,
             "ground_truth": "孕期合规"
           }
+        ],
+        "劳动关系合规": [
+          {
+            "id": "batch_ad4feb68",
+            "timestamp": "2026-02-03T16:16:56.000516",
+            "query": "我们是个初创团队，员工出了事之后就不来上班了",
+            "ai_prediction": "劳动关系合规",
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "初创团队负责人",
+            "tone": "迷茫",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，我们是个初创团队，员工出了事之后就不来上班了"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。之前有没有给过书面警告？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "口头说过几次，书面的好像没有"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。是什么原因想让他离开？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是工作态度不好，老是出问题"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「劳动关系合规」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "劳动关系合规"
+          },
+          {
+            "id": "batch_0337861f",
+            "timestamp": "2026-02-03T16:16:58.014934",
+            "query": "我刚毕业入职，员工出了事之后就不来上班了",
+            "ai_prediction": "劳动关系合规",
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "应届毕业生",
+            "tone": "紧张",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，我刚毕业入职，员工出了事之后就不来上班了"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。之前有没有给过书面警告？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "口头说过几次，书面的好像没有"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。是什么原因想让他离开？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是工作态度不好，老是出问题"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「劳动关系合规」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "劳动关系合规"
+          }
         ]
       }
     },
@@ -866,6 +1050,53 @@
             "total_turns": 6,
             "diagnosis_correct": true,
             "ground_truth": "个税优化/薪税筹划"
+          }
+        ],
+        "社保公积金代缴 (Social Security Proxy)": [
+          {
+            "id": "batch_d6d39932",
+            "timestamp": "2026-02-03T16:16:59.021843",
+            "query": "我刚毕业入职，之前吃过亏，越快越好，外地的员工社保怎么弄",
+            "ai_prediction": "社保公积金代缴",
+            "confidence": 0.85,
+            "source": "batch_ai_battle_v6",
+            "persona": "应届毕业生",
+            "tone": "紧张",
+            "dialogue_path": [
+              {
+                "step": 1,
+                "role": "human",
+                "content": "你好，我刚毕业入职，之前吃过亏，越快越好，外地的员工社保怎么弄"
+              },
+              {
+                "step": 2,
+                "role": "ai",
+                "content": "您好！我理解您的情况。公司大概多少人？"
+              },
+              {
+                "step": 3,
+                "role": "human",
+                "content": "现在有四五十人左右"
+              },
+              {
+                "step": 4,
+                "role": "ai",
+                "content": "明白了。目前薪资结构是怎样的？"
+              },
+              {
+                "step": 5,
+                "role": "human",
+                "content": "就是基本工资加绩效，比较简单"
+              },
+              {
+                "step": 6,
+                "role": "ai",
+                "content": "根据您的描述，这是典型的「社保公积金代缴」问题。我们可以帮您制定专业的解决方案，需要进一步咨询吗？"
+              }
+            ],
+            "total_turns": 6,
+            "diagnosis_correct": true,
+            "ground_truth": "社保公积金代缴"
           }
         ]
       }

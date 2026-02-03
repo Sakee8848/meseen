@@ -25,53 +25,72 @@ load_dotenv()
 # =======================================================
 # 🛡️ 配置 LLM
 # =======================================================
-api_key = os.getenv("OPENAI_API_KEY")
-api_base = os.getenv("OPENAI_API_BASE", "https://open.bigmodel.cn/api/paas/v4/")
-
-if not api_key:
-    raise ValueError("❌ 错误：未找到 OPENAI_API_KEY！请检查 .env 文件。")
-
-llm = ChatOpenAI(
-    model="glm-4",
-    temperature=0.3,  # 稍微提高，让对话更自然
-    openai_api_key=api_key,
-    openai_api_base=api_base
-)
-
 # =======================================================
-# 🔧 工具函数
+# 🛡️ 配置 LLM (支持自动故障切换)
 # =======================================================
-def parse_json_robust(text: str) -> Optional[dict]:
-    """健壮的 JSON 解析器"""
-    text = text.strip()
-    
-    # 尝试直接解析
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
+
+# 1. 初始化 Google LLM (首选)
+google_llm = None
+google_api_key = os.getenv("GOOGLE_API_KEY")
+if google_api_key:
     try:
-        return json.loads(text)
-    except:
-        pass
-    
-    # 尝试从 markdown 代码块提取
-    if "```" in text:
-        pattern = r"```(?:json)?\s*(.*?)\s*```"
-        match = re.search(pattern, text, re.DOTALL)
-        if match:
-            try:
-                return json.loads(match.group(1))
-            except:
-                pass
-    
-    # 尝试提取 JSON 对象
-    match = re.search(r"\{.*\}", text, re.DOTALL)
-    if match:
-        try:
-            json_str = match.group(0).replace('\n', ' ')
-            return json.loads(json_str)
-        except:
-            pass
-    
-    return None
+        google_llm = ChatGoogleGenerativeAI(
+            model="gemini-flash-latest",
+            temperature=0.3,
+            google_api_key=google_api_key,
+            convert_system_message_to_human=True,
+            transport="rest"
+        )
+        print("   ✅ Google Gemini 配置成功 (首选)")
+    except Exception as e:
+        print(f"   ⚠️ Google Gemini 初始化失败: {e}")
 
+# 2. 初始化 OpenAI/Zhipu LLM (备选)
+openai_llm = None
+openai_api_key = os.getenv("OPENAI_API_KEY")
+openai_api_base = os.getenv("OPENAI_API_BASE", "https://open.bigmodel.cn/api/paas/v4/")
+
+if openai_api_key:
+    try:
+        openai_llm = ChatOpenAI(
+            model="glm-4",
+            temperature=0.3,
+            openai_api_key=openai_api_key,
+            openai_api_base=openai_api_base
+        )
+        print("   ✅ OpenAI/GLM-4 配置成功 (备选)")
+    except Exception as e:
+        print(f"   ⚠️ OpenAI/GLM-4 初始化失败: {e}")
+
+# 3. 配置最终 LLM 与故障切换策略
+llm = None
+llm_provider = os.getenv("LLM_PROVIDER", "openai").lower()
+
+if llm_provider == "google":
+    if google_llm:
+        if openai_llm:
+            # 启用自动故障切换: Google -> OpenAI
+            llm = google_llm.with_fallbacks([openai_llm])
+            print("   🚀 策略: 优先使用 Google Gemini，失败自动切换至 OpenAI/GLM-4")
+        else:
+            llm = google_llm
+            print("   👉 策略: 仅使用 Google Gemini")
+    else:
+        # 如果指定 Google 但没配置好，回退到 OpenAI
+        if openai_llm:
+            print("   ⚠️ 警告: Google 未配置，降级使用 OpenAI/GLM-4")
+            llm = openai_llm
+        else:
+            raise ValueError("❌ 错误：未配置任何有效的 LLM API Key！")
+else:
+    # 默认 OpenAI
+    if openai_llm:
+        llm = openai_llm
+        print("   👉 策略: 仅使用 OpenAI/GLM-4")
+    else:
+         raise ValueError("❌ 错误：未找到 OPENAI_API_KEY！")
 
 # =======================================================
 # 📊 状态定义 (增强版)

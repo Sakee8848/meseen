@@ -1,0 +1,48 @@
+name: insurance-meseeing
+
+services:
+  # 保险密心后端 (端口 8001)
+  insurance-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: insurance-backend
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend:/app
+      - ./etl_factory:/app/../etl_factory
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    networks:
+      - insurance-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8001/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 保险密心前端 (端口 3001)
+  insurance-frontend:
+    build:
+      context: ./expert-app
+      dockerfile: Dockerfile
+    container_name: insurance-frontend
+    ports:
+      - "3001:3000"
+    depends_on:
+      insurance-backend:
+        condition: service_healthy
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8001
+    restart: unless-stopped
+    networks:
+      - insurance-net
+
+networks:
+  insurance-net:
+    driver: bridge
+
+volumes:
+  etl-data:

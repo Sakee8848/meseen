@@ -1,4 +1,4 @@
-name: meseeing # 🌟 显式指定项目名
+name: meseeing # 🌟 HR 密心 - 使用端口 8000/3000
 
 services:
   backend:
@@ -6,22 +6,38 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8000:8000" # HR 密心使用 8000，保险密心使用 8001
     volumes:
       - ./etl_factory:/app/etl_factory
       - ./backend/domain_db:/app/domain_db
+    env_file:
+      - .env
     environment:
       - PYTHONUNBUFFERED=1
+    networks:
+      - meseeing-network
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     build:
       context: ./expert-app
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:3000" # HR 密心使用 3000，保险密心使用 3001
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_URL=http://backend:8000
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    networks:
+      - meseeing-network
     restart: always
+
+networks:
+  meseeing-network:
+    driver: bridge
